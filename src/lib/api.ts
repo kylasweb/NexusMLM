@@ -244,7 +244,7 @@ export const updateWithdrawalStatus = async (
   });
 };
 
-export const createInvestmentPlan = async (plan: Omit<InvestmentPlan, "id">): Promise<InvestmentPlan> {
+export const createInvestmentPlan = async (plan: Omit<InvestmentPlan, "id">): Promise<InvestmentPlan> => {
   try {
     const { data, error } = await supabase
       .from("investment_plans")
@@ -260,7 +260,7 @@ export const createInvestmentPlan = async (plan: Omit<InvestmentPlan, "id">): Pr
   }
 };
 
-export const updateInvestmentPlan = async (id: string, plan: Partial<InvestmentPlan>): Promise<InvestmentPlan> {
+export const updateInvestmentPlan = async (id: string, plan: Partial<InvestmentPlan>): Promise<InvestmentPlan> => {
   try {
     const { data, error } = await supabase
       .from("investment_plans")
@@ -335,7 +335,7 @@ export const updateSystemSettings = async (key: string, value: any) => {
 };
 
 // Investment Plan Management
-export async function deleteInvestmentPlan(id: string): Promise<void> {
+export const deleteInvestmentPlan = async (id: string): Promise<void> => {
   try {
     const { error } = await supabase
       .from("investment_plans")
@@ -347,7 +347,7 @@ export async function deleteInvestmentPlan(id: string): Promise<void> {
     console.error("Error deleting investment plan:", error);
     throw error;
   }
-}
+};
 
 // Page Templates API
 export interface PageTemplate {
