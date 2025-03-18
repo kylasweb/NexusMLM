@@ -16,7 +16,6 @@ import WebsiteEditor from "./components/visual-editor/WebsiteEditor";
 import TeamManagement from "./components/team/TeamManagement";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import { ErrorBoundary } from "./components/error-boundary";
-import { useAuth } from "./lib/auth";
 
 const routes: RouteObject[] = [
   {

@@ -13,7 +13,10 @@ interface StatisticsCardsProps {
   loading?: boolean;
 }
 
-const StatisticsCards = ({ stats, loading = false }: StatisticsCardsProps) => {
+const StatisticsCards = ({
+  stats = { earnings: "$0", teamSize: "0", investments: "0", rank: "N/A" },
+  loading = false,
+}: StatisticsCardsProps) => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
       {/* Total Earnings */}
