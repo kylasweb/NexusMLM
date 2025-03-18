@@ -27,6 +27,7 @@ import {
   ArrowUp,
   ArrowDown,
   Sparkles,
+  DollarSign,
 } from "lucide-react";
 import DashboardLayout from "../layout/DashboardLayout";
 
@@ -710,3 +711,146 @@ const RankManagement = () => {
                     step="0.5"
                     required
                   />
+                </div>
+              </div>
+            </div>
+
+            <DialogFooter>
+              <Button type="submit" onClick={handleCreateRank}>
+                Create
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Edit Rank Dialog */}
+        <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>Edit Rank</DialogTitle>
+              <DialogDescription>
+                Edit the details of the rank
+              </DialogDescription>
+            </DialogHeader>
+
+            <div className="space-y-4 py-4">
+              <div className="space-y-2">
+                <Label htmlFor="rankName">Rank Name *</Label>
+                <Input
+                  id="rankName"
+                  placeholder="e.g., Gold, Diamond, etc."
+                  value={rankName}
+                  onChange={(e) => setRankName(e.target.value)}
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="rankLevel">Rank Level *</Label>
+                <Input
+                  id="rankLevel"
+                  type="number"
+                  placeholder="e.g., 1, 2, 3, etc."
+                  value={rankLevel}
+                  onChange={(e) => setRankLevel(e.target.value)}
+                  min="1"
+                  step="1"
+                  required
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="minDirectReferrals">
+                    Min Direct Referrals *
+                  </Label>
+                  <Input
+                    id="minDirectReferrals"
+                    type="number"
+                    placeholder="e.g., 5"
+                    value={minDirectReferrals}
+                    onChange={(e) => setMinDirectReferrals(e.target.value)}
+                    min="0"
+                    step="1"
+                    required
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="minTeamSize">Min Team Size *</Label>
+                  <Input
+                    id="minTeamSize"
+                    type="number"
+                    placeholder="e.g., 20"
+                    value={minTeamSize}
+                    onChange={(e) => setMinTeamSize(e.target.value)}
+                    min="0"
+                    step="1"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="minInvestment">Min Investment ($) *</Label>
+                  <Input
+                    id="minInvestment"
+                    type="number"
+                    placeholder="e.g., 1000"
+                    value={minInvestment}
+                    onChange={(e) => setMinInvestment(e.target.value)}
+                    min="0"
+                    step="100"
+                    required
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="commissionRate">Commission Rate (%) *</Label>
+                  <Input
+                    id="commissionRate"
+                    type="number"
+                    placeholder="e.g., 10"
+                    value={commissionRate}
+                    onChange={(e) => setCommissionRate(e.target.value)}
+                    min="0"
+                    max="100"
+                    step="0.5"
+                    required
+                  />
+                </div>
+              </div>
+            </div>
+
+            <DialogFooter>
+              <Button type="submit" onClick={handleEditRank}>
+                Update
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Delete Rank Dialog */}
+        <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>Delete Rank</DialogTitle>
+              <DialogDescription>
+                Are you sure you want to delete this rank?
+              </DialogDescription>
+            </DialogHeader>
+
+            <DialogFooter>
+              <Button type="submit" onClick={handleDeleteRank}>
+                Delete
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </div>
+    </DashboardLayout>
+  );
+};
+
+export default RankManagement;
