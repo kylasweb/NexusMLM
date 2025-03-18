@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 import { useRoutes, Routes, Route } from "react-router-dom";
-import Home from "./components/home";
+import HomePage from "./components/public/HomePage";
 import tempoRoutes from "tempo-routes";
 import appRoutes from "./routes";
 import { AuthProvider } from "./lib/auth";
@@ -42,7 +42,7 @@ function App() {
 
         {/* Main app routes */}
         <Routes>
-          <Route path="/" element={<Home />} />
+          <Route path="/" element={<HomePage />} />
           {import.meta.env.VITE_TEMPO === "true" && (
             <Route path="/tempobook/*" />
           )}
