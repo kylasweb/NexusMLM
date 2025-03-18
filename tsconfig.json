@@ -15,11 +15,14 @@
     "jsx": "react-jsx",
 
     "strict": false,
+    "allowJs": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
     "paths": {
       "@/*": ["./src/*"]
     }
   },
   "include": ["src"],
-  "exclude": ["src/tempobook"],
+  "exclude": ["src/tempobook", "node_modules"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

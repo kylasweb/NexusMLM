@@ -6,22 +6,21 @@ import { tempo } from "tempo-devtools/dist/vite";
 // https://vitejs.dev/config/
 export default defineConfig({
   base: "/",
+  define: {
+    'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'production')
+  },
   build: {
     outDir: "dist",
     emptyOutDir: true,
-    sourcemap: process.env.NODE_ENV === "development",
+    sourcemap: false,
     rollupOptions: {
       output: {
         manualChunks: {
           vendor: ["react", "react-dom", "react-router-dom"],
-          ui: [
-            "@/components/ui",
-            "lucide-react",
-            "@radix-ui/react-dialog",
-            "@radix-ui/react-tabs"
-          ]
+          ui: ["@radix-ui/react-dialog", "@radix-ui/react-tabs"]
         }
-      }
+      },
+      external: ['/components/ui/*']
     }
   },
   plugins: [
