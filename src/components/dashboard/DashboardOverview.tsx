@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { getUserStats, getUserActivities } from "@/lib/api";
+import { getUserStats, getUserActivities, getBinaryMatrixStats } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
 import { Link } from "react-router-dom";
 import {
@@ -18,39 +18,27 @@ import {
   PiggyBank,
   Network,
 } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
 import StatisticsCards from "./StatisticsCards";
 import BinaryMatrixPreview from "./BinaryMatrixPreview";
 import RecentActivities from "./RecentActivities";
 import QuickActions from "./QuickActions";
 
-interface DashboardOverviewProps {
-  userName?: string;
-  userAvatar?: string;
-  stats?: {
-    earnings: string;
-    teamSize: string;
-    investments: string;
-    rank: string;
-  };
-}
-
-const DashboardOverview = ({
-  userName,
-  userAvatar,
-  stats: initialStats,
-}: DashboardOverviewProps) => {
-  const [stats, setStats] = useState(
-    initialStats || {
-      earnings: "$0",
-      teamSize: "0",
-      investments: "$0",
-      rank: "Bronze",
-    },
-  );
+const DashboardOverview = () => {
+  const [stats, setStats] = useState({
+    earnings: "$0",
+    teamSize: "0",
+    investments: "$0",
+    rank: "Bronze",
+  });
   const [activities, setActivities] = useState([]);
+  const [matrixStats, setMatrixStats] = useState({
+    leftLeg: { totalMembers: 0, activeMembers: 0, volume: 0, growth: 0 },
+    rightLeg: { totalMembers: 0, activeMembers: 0, volume: 0, growth: 0 },
+  });
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const { user } = useAuth();
+  const { toast } = useToast();
 
   useEffect(() => {
     const fetchDashboardData = async () => {
@@ -58,30 +46,49 @@ const DashboardOverview = ({
 
       try {
         setLoading(true);
-        const [statsData, activitiesData] = await Promise.all([
+        const [statsData, activitiesData, matrixData] = await Promise.all([
           getUserStats(user.id),
           getUserActivities(user.id),
+          getBinaryMatrixStats(user.id),
         ]);
 
-        setStats(statsData || stats);
-        setActivities(activitiesData || []);
+        if (statsData) setStats(statsData);
+        if (activitiesData) setActivities(activitiesData);
+        if (matrixData) setMatrixStats(matrixData);
       } catch (err: any) {
-        setError(err.message || "Failed to load dashboard data");
         console.error("Dashboard data error:", err);
+        toast({
+          title: "Error",
+          description: "Failed to load dashboard data. Please try again later.",
+          variant: "destructive",
+        });
       } finally {
         setLoading(false);
       }
     };
 
     fetchDashboardData();
-  }, [user]);
+  }, [user, toast]);
+
+  if (!user) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold mb-4">Please log in to view your dashboard</h2>
+          <Link to="/login">
+            <Button>Log In</Button>
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto p-6">
       {/* Welcome Section */}
       <div className="mb-8">
         <h1 className="text-2xl font-bold">
-          Welcome back, {userName || user?.email?.split("@")[0] || "User"}!
+          Welcome back, {user.email?.split("@")[0] || "User"}!
         </h1>
         <p className="text-gray-500">
           Here's what's happening with your network today.
@@ -108,7 +115,7 @@ const DashboardOverview = ({
               </Link>
             </CardHeader>
             <CardContent>
-              <BinaryMatrixPreview userId={user?.id} />
+              <BinaryMatrixPreview userId={user.id} matrixStats={matrixStats} loading={loading} />
             </CardContent>
           </Card>
         </div>
@@ -120,9 +127,11 @@ const DashboardOverview = ({
               <CardTitle className="text-lg font-medium">
                 Recent Activities
               </CardTitle>
-              <Button variant="ghost" size="sm">
-                View All
-              </Button>
+              <Link to="/activities">
+                <Button variant="ghost" size="sm">
+                  View All
+                </Button>
+              </Link>
             </CardHeader>
             <CardContent>
               <RecentActivities activities={activities} loading={loading} />
