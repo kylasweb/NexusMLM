@@ -154,9 +154,9 @@ const ContactPage = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {[
               {
-                question: "How do I join MLM Matrix?",
+                question: "How do I join Zocial MLM?",
                 answer:
-                  "You can join MLM Matrix by registering on our platform. Click on the Register button in the top right corner and follow the instructions.",
+                  "You can join Zocial MLM by registering on our platform. Click on the Register button in the top right corner and follow the instructions.",
               },
               {
                 question: "What payment methods do you accept?",

@@ -11,7 +11,7 @@ const PublicFooter = () => {
       <div className="container mx-auto px-4 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="space-y-4">
-            <h3 className="text-xl font-bold">MLM Matrix</h3>
+            <h3 className="text-xl font-bold">Zocial MLM</h3>
             <p className="text-gray-400">
               A revolutionary binary matrix MLM system with advanced management
               tools and comprehensive features for all your network marketing
@@ -126,7 +126,7 @@ const PublicFooter = () => {
 
         <div className="flex flex-col md:flex-row justify-between items-center">
           <p className="text-gray-400 text-sm">
-            © {new Date().getFullYear()} MLM Matrix. All rights reserved.
+            © {new Date().getFullYear()} Zocial MLM. All rights reserved.
           </p>
           <div className="mt-4 md:mt-0">
             <p className="text-gray-400 text-sm">

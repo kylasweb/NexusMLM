@@ -428,7 +428,7 @@ const PlansPage = () => {
           <h2 className="text-3xl font-bold mb-4">Ready to Start Investing?</h2>
           <p className="text-xl mb-6 max-w-2xl mx-auto">
             Join thousands of successful investors and start building your
-            financial future today with our powerful MLM Matrix system.
+            financial future today with our powerful Zocial MLM system.
           </p>
           <Button size="lg" className="bg-white text-blue-700 hover:bg-blue-50">
             Register Now

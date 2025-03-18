@@ -61,7 +61,7 @@ const PublicHeader = () => {
       <div className="container flex h-16 items-center justify-between">
         <div className="flex items-center gap-2">
           <Link to="/" className="flex items-center space-x-2">
-            <span className="font-bold text-xl">MLM Matrix</span>
+            <span className="font-bold text-xl">Zocial MLM</span>
           </Link>
         </div>
 

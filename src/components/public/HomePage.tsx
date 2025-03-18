@@ -91,7 +91,7 @@ const HomePage = () => {
           <div className="text-center mb-16">
             <Badge className="mb-4">Features</Badge>
             <h2 className="text-3xl font-bold mb-4">
-              Why Choose Our MLM Matrix System
+              Why Choose Our Zocial MLM System
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
               Our platform offers everything you need to build and manage a
@@ -157,7 +157,7 @@ const HomePage = () => {
             <Badge className="mb-4">Process</Badge>
             <h2 className="text-3xl font-bold mb-4">How It Works</h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Getting started with our MLM Matrix system is simple and
+              Getting started with our Zocial MLM system is simple and
               straightforward.
             </p>
           </div>
@@ -227,7 +227,7 @@ const HomePage = () => {
                 role: "Gold Member",
                 image: "https://api.dicebear.com/7.x/avataaars/svg?seed=sarah",
                 quote:
-                  "I've been with MLM Matrix for just 6 months and I've already built a team of over 100 members. The binary structure makes it so easy to grow!",
+                  "I've been with Zocial MLM for just 6 months and I've already built a team of over 100 members. The binary structure makes it so easy to grow!",
               },
               {
                 name: "Michael Rodriguez",
@@ -235,7 +235,7 @@ const HomePage = () => {
                 image:
                   "https://api.dicebear.com/7.x/avataaars/svg?seed=michael",
                 quote:
-                  "The compensation plan is the best I've seen in the industry. I'm earning more with MLM Matrix than I did in my corporate job of 15 years.",
+                  "The compensation plan is the best I've seen in the industry. I'm earning more with Zocial MLM than I did in my corporate job of 15 years.",
               },
               {
                 name: "Jennifer Lee",
@@ -288,7 +288,7 @@ const HomePage = () => {
           </h2>
           <p className="text-xl mb-8 max-w-3xl mx-auto">
             Join our community today and start building your path to financial
-            freedom with our powerful MLM Matrix system.
+            freedom with our powerful Zocial MLM system.
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
             <Button

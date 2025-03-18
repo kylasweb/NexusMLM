@@ -9,7 +9,7 @@ const AboutPage = () => {
       <div className="container mx-auto px-4 py-12">
         {/* Hero Section */}
         <div className="text-center mb-16">
-          <h1 className="text-4xl font-bold mb-4">About MLM Matrix</h1>
+          <h1 className="text-4xl font-bold mb-4">About Zocial MLM</h1>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
             A revolutionary binary matrix MLM system designed to maximize your
             earning potential and build a sustainable network marketing
@@ -22,7 +22,7 @@ const AboutPage = () => {
           <div>
             <h2 className="text-3xl font-bold mb-4">Our Story</h2>
             <p className="text-gray-600 mb-4">
-              Founded in 2023, MLM Matrix was created with a simple mission: to
+              Founded in 2023, Zocial MLM was created with a simple mission: to
               provide a fair, transparent, and profitable network marketing
               platform that benefits everyone involved.
             </p>
@@ -32,7 +32,7 @@ const AboutPage = () => {
               maximizing earning potential for all participants.
             </p>
             <p className="text-gray-600">
-              Today, MLM Matrix has grown into a global community of
+              Today, Zocial MLM has grown into a global community of
               entrepreneurs and investors who are building financial freedom
               through our innovative binary matrix structure and comprehensive
               suite of tools.

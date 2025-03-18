@@ -140,7 +140,7 @@ const Sidebar = ({ className, collapsed = false }: SidebarProps) => {
             M
           </div>
         ) : (
-          <div className="text-xl font-bold">MLM Matrix</div>
+          <div className="text-xl font-bold">Zocial MLM</div>
         )}
       </div>
 

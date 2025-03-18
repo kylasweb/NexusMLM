@@ -120,17 +120,20 @@ export interface InvestmentPlan {
   status: "active" | "inactive";
 }
 
-export async function getInvestmentPlans(): Promise<InvestmentPlan[]> {
-  return handleApiRequest(async () => {
+export const getInvestmentPlans = async () => {
+  try {
     const { data, error } = await supabase
-      .from("investment_plans")
-      .select("*")
-      .order("minAmount", { ascending: true });
+      .from('investment_plans')
+      .select('*')
+      .order('min_amount', { ascending: true });
 
     if (error) throw error;
     return data;
-  });
-}
+  } catch (error) {
+    console.error('API Error:', error);
+    return [];
+  }
+};
 
 export const getUserInvestments = async (userId: string) => {
   return handleApiRequest(async () => {
@@ -218,15 +221,24 @@ export const getAllUsers = async () => {
 };
 
 export const getAllWithdrawals = async () => {
-  return handleApiRequest(async () => {
+  try {
     const { data, error } = await supabase
-      .from("withdrawals")
-      .select("*, user:user_id(full_name, email)")
-      .order("created_at", { ascending: false });
+      .from('withdrawals')
+      .select(`
+        *,
+        user:user_id (
+          full_name,
+          email
+        )
+      `)
+      .order('created_at', { ascending: false });
 
     if (error) throw error;
     return data;
-  });
+  } catch (error) {
+    console.error('API Error:', error);
+    return [];
+  }
 };
 
 export const updateWithdrawalStatus = async (
@@ -314,24 +326,35 @@ export const updateMatrixSettings = async (settings: any) => {
 };
 
 export const getSystemSettings = async () => {
-  return handleApiRequest(async () => {
-    const { data, error } = await supabase.from("system_settings").select("*");
+  try {
+    const { data, error } = await supabase
+      .from('system_settings')
+      .select('*')
+      .eq('key', 'general')
+      .single();
 
     if (error) throw error;
-    return data;
-  });
+    return data?.value || null;
+  } catch (error) {
+    console.error('API Error:', error);
+    return null;
+  }
 };
 
 export const updateSystemSettings = async (key: string, value: any) => {
-  return handleApiRequest(async () => {
+  try {
     const { data, error } = await supabase
-      .from("system_settings")
-      .update({ value })
-      .eq("key", key);
+      .from('system_settings')
+      .upsert({ key, value })
+      .select()
+      .single();
 
     if (error) throw error;
     return data;
-  });
+  } catch (error) {
+    console.error('API Error:', error);
+    throw error;
+  }
 };
 
 // Investment Plan Management

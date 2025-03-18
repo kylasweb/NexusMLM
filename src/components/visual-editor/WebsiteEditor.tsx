@@ -483,7 +483,7 @@ const WebsiteEditor = () => {
                   <div className="space-y-4">
                     <div className="space-y-2">
                       <Label htmlFor="site-name">Site Name</Label>
-                      <Input id="site-name" defaultValue="MLM Matrix" />
+                      <Input id="site-name" defaultValue="Zocial MLM" />
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="site-description">Description</Label>

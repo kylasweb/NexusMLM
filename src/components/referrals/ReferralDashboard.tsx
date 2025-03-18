@@ -154,8 +154,8 @@ const ReferralDashboard = () => {
     if (navigator.share) {
       try {
         await navigator.share({
-          title: "Join MLM Matrix",
-          text: "Join my network on MLM Matrix and start earning today!",
+          title: "Join Zocial MLM",
+          text: "Join my network on Zocial MLM and start earning today!",
           url: referralLink,
         });
       } catch (err: any) {

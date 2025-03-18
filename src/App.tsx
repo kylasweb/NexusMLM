@@ -1,55 +1,42 @@
-import { Suspense } from "react";
-import { useRoutes, Routes, Route } from "react-router-dom";
-import HomePage from "./components/public/HomePage";
-import tempoRoutes from "tempo-routes";
-import appRoutes from "./routes";
-import { AuthProvider } from "./lib/auth";
+import React from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { Toaster } from "@/components/ui/toaster";
+import { AuthProvider } from "@/lib/auth";
+import { ThemeProvider } from "@/contexts/ThemeContext";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { Toaster as Sonner } from "@/components/ui/sonner";
+import { routes } from "./routes";
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 1000 * 60 * 5, // 5 minutes
+      retry: 1,
+    },
+  },
+});
 
 function App() {
   return (
-    <AuthProvider>
-      <Suspense
-        fallback={
-          <div className="flex justify-center items-center h-screen">
-            <div className="flex flex-col items-center">
-              <svg
-                className="animate-spin h-10 w-10 text-primary"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-              >
-                <circle
-                  className="opacity-25"
-                  cx="12"
-                  cy="12"
-                  r="10"
-                  stroke="currentColor"
-                  strokeWidth="4"
-                ></circle>
-                <path
-                  className="opacity-75"
-                  fill="currentColor"
-                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                ></path>
-              </svg>
-              <p className="mt-4 text-gray-600">Loading application...</p>
-            </div>
-          </div>
-        }
-      >
-        {/* For Tempo routes */}
-        {import.meta.env.VITE_TEMPO === "true" && useRoutes(tempoRoutes)}
-
-        {/* Main app routes */}
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          {import.meta.env.VITE_TEMPO === "true" && (
-            <Route path="/tempobook/*" />
-          )}
-        </Routes>
-        {useRoutes(appRoutes)}
-      </Suspense>
-    </AuthProvider>
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider defaultTheme="dark" storageKey="nexus-theme">
+        <AuthProvider>
+          <Router>
+            <Routes>
+              {routes.map((route, index) => (
+                <Route
+                  key={index}
+                  path={route.path}
+                  element={route.element}
+                />
+              ))}
+            </Routes>
+            <Toaster />
+            <Sonner />
+          </Router>
+        </AuthProvider>
+      </ThemeProvider>
+    </QueryClientProvider>
   );
 }
 

@@ -84,6 +84,17 @@ interface Rank {
   commissionRate: string;
 }
 
+const defaultSettings = {
+  site_name: "Zocial MLM",
+  admin_email: "Kailaspnair@yahoo.com",
+  currency: "USD",
+  timezone: "UTC",
+  require_kyc: "yes",
+  min_withdrawal: "50",
+  withdrawal_fee: "2.5",
+  enable_2fa: "no"
+};
+
 const AdminDashboard = () => {
   const [selectedTab, setSelectedTab] = useState("users");
   const [isLoading, setIsLoading] = useState(false);
@@ -92,8 +103,8 @@ const AdminDashboard = () => {
   const [plans, setPlans] = useState<InvestmentPlan[]>([]);
   const [ranks, setRanks] = useState<Rank[]>([]);
   const [systemSettings, setSystemSettings] = useState<SystemSettings>({
-    site_name: "MLM Matrix",
-    admin_email: "admin@example.com",
+    site_name: "Zocial MLM",
+    admin_email: "Kailaspnair@yahoo.com",
     currency: "USD",
     timezone: "UTC",
     require_kyc: "yes",
