@@ -110,14 +110,27 @@ export const getUserStats = async (userId: string) => {
 };
 
 // Investments
-export const getInvestmentPlans = async () => {
+export interface InvestmentPlan {
+  id: string;
+  name: string;
+  minAmount: number;
+  maxAmount: number;
+  roi: number;
+  duration: number;
+  status: "active" | "inactive";
+}
+
+export async function getInvestmentPlans(): Promise<InvestmentPlan[]> {
   return handleApiRequest(async () => {
-    const { data, error } = await supabase.from("investment_plans").select("*");
+    const { data, error } = await supabase
+      .from("investment_plans")
+      .select("*")
+      .order("minAmount", { ascending: true });
 
     if (error) throw error;
     return data;
   });
-};
+}
 
 export const getUserInvestments = async (userId: string) => {
   return handleApiRequest(async () => {
@@ -313,31 +326,6 @@ export const updateSystemSettings = async (key: string, value: any) => {
 };
 
 // Investment Plan Management
-export interface InvestmentPlan {
-  id: string;
-  name: string;
-  minAmount: number;
-  maxAmount: number;
-  roi: number;
-  duration: number;
-  status: "active" | "inactive";
-}
-
-export async function getInvestmentPlans(): Promise<InvestmentPlan[]> {
-  try {
-    const { data, error } = await supabase
-      .from("investment_plans")
-      .select("*")
-      .order("minAmount", { ascending: true });
-
-    if (error) throw error;
-    return data || [];
-  } catch (error) {
-    console.error("Error fetching investment plans:", error);
-    throw error;
-  }
-}
-
 export async function createInvestmentPlan(plan: Omit<InvestmentPlan, "id">): Promise<InvestmentPlan> {
   try {
     const { data, error } = await supabase
