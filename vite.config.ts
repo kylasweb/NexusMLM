@@ -5,11 +5,11 @@ import { tempo } from "tempo-devtools/dist/vite";
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  base: process.env.NODE_ENV === "production" ? "/" : "/",
+  base: "/",
   build: {
     outDir: "dist",
     emptyOutDir: true,
-    sourcemap: false,
+    sourcemap: process.env.NODE_ENV === "development",
     rollupOptions: {
       output: {
         manualChunks: {
@@ -31,16 +31,15 @@ export default defineConfig({
     tempo(),
   ],
   resolve: {
-    preserveSymlinks: true,
     alias: {
       "@": path.resolve(__dirname, "./src"),
     },
   },
   server: {
-    host: true,
-    port: 3000
+    port: 3000,
+    host: true
   },
-  optimizeDeps: {
-    include: ["react", "react-dom", "react-router-dom"],
+  preview: {
+    port: 3000
   }
 });

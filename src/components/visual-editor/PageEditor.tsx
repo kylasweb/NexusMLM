@@ -54,9 +54,11 @@ import {
   Check,
   X,
   AlertCircle,
+  CheckCircle,
 } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import PublicLayout from "../layout/PublicLayout";
+import { Badge } from "@/components/ui/badge";
 
 interface PageEditorProps {
   pageId?: string;
@@ -248,20 +250,9 @@ const PageEditor = ({ pageId, isPreview = false }: PageEditorProps) => {
       <PublicLayout>
         <div className="container mx-auto py-8">
           {/* This would be the actual rendered page content */}
-          <div className="bg-white p-8 rounded-lg shadow-md">
-            <h1 className="text-3xl font-bold mb-6">{pageName}</h1>
-            <p className="text-gray-600 mb-4">
-              This is a preview of your page. In a real implementation, this would
-              show the actual rendered content of your page.
-            </p>
-            <div className="border-2 border-dashed border-gray-300 rounded-md p-8 mb-6 text-center text-gray-500">
-              Page content would appear here
-            </div>
-            <div className="flex justify-end">
-              <Button onClick={togglePreviewMode}>
-                <Eye className="mr-2 h-4 w-4" /> Exit Preview
-              </Button>
-            </div>
+          <div className="prose max-w-none">
+            <h1>{pageName}</h1>
+            <p>This is a preview of your page content.</p>
           </div>
         </div>
       </PublicLayout>
@@ -271,317 +262,204 @@ const PageEditor = ({ pageId, isPreview = false }: PageEditorProps) => {
   return (
     <div className="flex h-screen bg-gray-100">
       {/* Left Panel */}
-      {showLeftPanel && (
-        <div className="w-64 bg-white border-r border-gray-200 flex flex-col">
-          <div className="p-4 border-b border-gray-200">
-            <Tabs defaultValue={activePanel} onValueChange={setActivePanel}>
-              <TabsList className="grid w-full grid-cols-3">
-                <TabsTrigger value="elements">
-                  <Layers className="h-4 w-4 mr-2" /> Elements
-                </TabsTrigger>
-                <TabsTrigger value="pages">
-                  <FileText className="h-4 w-4 mr-2" /> Pages
-                </TabsTrigger>
-                <TabsTrigger value="settings">
-                  <Settings className="h-4 w-4 mr-2" /> Settings
-                </TabsTrigger>
-              </TabsList>
-            </Tabs>
-          </div>
+      <div
+        className={`bg-white border-r w-64 transition-all duration-300 ${
+          showLeftPanel ? "translate-x-0" : "-translate-x-full"
+        }`}
+      >
+        <div className="p-4">
+          <Tabs defaultValue={activePanel} className="w-full">
+            <TabsList className="w-full">
+              <TabsTrigger value="elements" className="flex-1">
+                Elements
+              </TabsTrigger>
+              <TabsTrigger value="pages" className="flex-1">
+                Pages
+              </TabsTrigger>
+            </TabsList>
 
-          <div className="flex-1 overflow-auto">
-            {activePanel === "elements" && (
-              <div>
-                <div className="p-4 border-b border-gray-200">
-                  <div className="flex space-x-2 overflow-x-auto pb-2">
-                    {elementCategories.map((category) => (
-                      <Button
-                        key={category.id}
-                        variant={
-                          activeCategory === category.id
-                            ? "default"
-                            : "outline"
-                        }
-                        size="sm"
-                        onClick={() => setActiveCategory(category.id)}
-                        className="flex-shrink-0"
-                      >
-                        {category.icon}
-                        <span className="ml-1">{category.name}</span>
-                      </Button>
-                    ))}
-                  </div>
-                </div>
-
-                <ScrollArea className="h-[calc(100vh-13rem)]">
-                  <div className="p-4 grid grid-cols-2 gap-2">
-                    {getElementsForCategory(activeCategory).map((element) => (
-                      <div
-                        key={element.id}
-                        className="border border-gray-200 rounded-md p-2 flex flex-col items-center justify-center cursor-move hover:bg-gray-50"
-                        draggable
-                        onDragStart={(e) => handleDragStart(e, element.id)}
-                        onClick={() => handleElementClick(element.id)}
-                      >
-                        <div className="w-8 h-8 flex items-center justify-center mb-1">
-                          {element.icon}
-                        </div>
-                        <span className="text-xs">{element.name}</span>
-                      </div>
-                    ))}
-                  </div>
-                </ScrollArea>
-              </div>
-            )}
-
-            {activePanel === "pages" && (
-              <ScrollArea className="h-[calc(100vh-9rem)]">
-                <div className="p-4">
-                  <div className="flex justify-between items-center mb-4">
-                    <h3 className="font-medium">Page Templates</h3>
-                    <Button size="sm" variant="ghost">
-                      <Plus className="h-4 w-4 mr-1" /> New
-                    </Button>
-                  </div>
-                  <div className="grid grid-cols-2 gap-3">
-                    {pageTemplates.map((template) => (
-                      <div
-                        key={template.id}
-                        className="border border-gray-200 rounded-md overflow-hidden hover:border-blue-500 cursor-pointer"
-                      >
-                        <img
-                          src={template.thumbnail}
-                          alt={template.name}
-                          className="w-full h-20 object-cover"
-                        />
-                        <div className="p-2 text-center text-xs">
-                          {template.name}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-
-                  <Separator className="my-6" />
-
-                  <div className="flex justify-between items-center mb-4">
-                    <h3 className="font-medium">Your Pages</h3>
-                  </div>
-                  <div className="space-y-2">
-                    {savedPages.map((page) => (
-                      <div
-                        key={page.id}
-                        className="border border-gray-200 rounded-md p-3 hover:bg-gray-50 cursor-pointer"
-                      >
-                        <div className="flex justify-between items-center">
-                          <div>
-                            <span className="block">{page.name}</span>
-                            <span className="text-xs text-gray-500">
-                              /{page.slug}
-                            </span>
-                          </div>
-                          <div className="flex items-center">
-                            <Badge
-                              variant={page.status === "published" ? "default" : "outline"}
-                              className="mr-2"
-                            >
-                              {page.status}
-                            </Badge>
-                            <Button size="sm" variant="ghost">
-                              <Eye className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </ScrollArea>
-            )}
-
-            {activePanel === "settings" && (
-              <div className="p-4">
-                <h3 className="font-medium mb-4">Page Settings</h3>
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="page-title">Page Title</Label>
-                    <Input
-                      id="page-title"
-                      value={pageName}
-                      onChange={(e) => setPageName(e.target.value)}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="page-slug">URL Slug</Label>
-                    <Input
-                      id="page-slug"
-                      value={pageSlug}
-                      onChange={(e) => setPageSlug(e.target.value)}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="page-status">Status</Label>
-                    <Select
-                      value={pageStatus}
-                      onValueChange={setPageStatus}
+            <TabsContent value="elements" className="mt-4">
+              <div className="space-y-4">
+                {elementCategories.map((category) => (
+                  <div key={category.id}>
+                    <button
+                      className={`flex items-center w-full p-2 rounded-lg text-sm ${
+                        activeCategory === category.id
+                          ? "bg-blue-50 text-blue-600"
+                          : "hover:bg-gray-50"
+                      }`}
+                      onClick={() => setActiveCategory(category.id)}
                     >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select status" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="draft">Draft</SelectItem>
-                        <SelectItem value="published">Published</SelectItem>
-                      </SelectContent>
-                    </Select>
+                      {category.icon}
+                      <span className="ml-2">{category.name}</span>
+                    </button>
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="page-description">Meta Description</Label>
-                    <Textarea
-                      id="page-description"
-                      placeholder="Enter a description for search engines"
-                    />
-                  </div>
-                  <Button
-                    className="w-full"
-                    onClick={() => setShowSaveDialog(true)}
-                  >
-                    <Save className="h-4 w-4 mr-2" /> Save Page
-                  </Button>
-                </div>
+                ))}
               </div>
-            )}
-          </div>
-        </div>
-      )}
+            </TabsContent>
 
-      {/* Main Editor Area */}
-      <div className="flex-1 flex flex-col">
+            <TabsContent value="pages" className="mt-4">
+              <div className="space-y-4">
+                {savedPages.map((page) => (
+                  <div
+                    key={page.id}
+                    className="flex items-center justify-between p-2 hover:bg-gray-50 rounded-lg"
+                  >
+                    <div>
+                      <p className="font-medium">{page.name}</p>
+                      <p className="text-sm text-gray-500">/{page.slug}</p>
+                    </div>
+                    <Badge
+                      variant={page.status === "published" ? "default" : "secondary"}
+                    >
+                      {page.status}
+                    </Badge>
+                  </div>
+                ))}
+              </div>
+            </TabsContent>
+          </Tabs>
+        </div>
+      </div>
+
+      {/* Main Content Area */}
+      <div className="flex-1 flex flex-col overflow-hidden">
         {/* Toolbar */}
-        <div className="bg-white border-b border-gray-200 p-2 flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setShowLeftPanel(!showLeftPanel)}
-            >
-              {showLeftPanel ? (
-                <PanelLeft className="h-5 w-5" />
-              ) : (
-                <Layers className="h-5 w-5" />
-              )}
-            </Button>
-            <Separator orientation="vertical" className="h-6" />
-            <Button variant="ghost" size="icon">
-              <Move className="h-5 w-5" />
-            </Button>
-            <Separator orientation="vertical" className="h-6" />
-            <Button variant="ghost" size="icon">
-              <Bold className="h-5 w-5" />
-            </Button>
-            <Button variant="ghost" size="icon">
-              <Italic className="h-5 w-5" />
-            </Button>
-            <Button variant="ghost" size="icon">
-              <Underline className="h-5 w-5" />
-            </Button>
-            <Separator orientation="vertical" className="h-6" />
-            <Button variant="ghost" size="icon">
-              <AlignLeft className="h-5 w-5" />
-            </Button>
-            <Button variant="ghost" size="icon">
-              <AlignCenter className="h-5 w-5" />
-            </Button>
-            <Button variant="ghost" size="icon">
-              <AlignRight className="h-5 w-5" />
-            </Button>
-            <Separator orientation="vertical" className="h-6" />
-            <Button variant="ghost" size="icon">
-              <Link className="h-5 w-5" />
-            </Button>
-            <Button variant="ghost" size="icon">
-              <Image className="h-5 w-5" />
-            </Button>
-          </div>
-          <div className="flex items-center space-x-2">
-            <Button variant="outline" size="sm" onClick={togglePreviewMode}>
-              <Eye className="h-4 w-4 mr-2" /> Preview
-            </Button>
-            <Button
-              size="sm"
-              onClick={() => setShowSaveDialog(true)}
-            >
-              <Save className="h-4 w-4 mr-2" /> Save
-            </Button>
+        <div className="bg-white border-b p-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setShowLeftPanel(!showLeftPanel)}
+              >
+                {showLeftPanel ? (
+                  <PanelLeft className="h-4 w-4" />
+                ) : (
+                  <ChevronRight className="h-4 w-4" />
+                )}
+              </Button>
+              <Input
+                className="w-64"
+                placeholder="Page name"
+                value={pageName}
+                onChange={(e) => setPageName(e.target.value)}
+              />
+            </div>
+
+            <div className="flex items-center space-x-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setPreviewMode(!previewMode)}
+              >
+                <Eye className="h-4 w-4 mr-2" />
+                Preview
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowSaveDialog(true)}
+              >
+                <Save className="h-4 w-4 mr-2" />
+                Save
+              </Button>
+            </div>
           </div>
         </div>
 
-        {/* Canvas */}
+        {/* Canvas Area */}
         <div
-          className="flex-1 bg-gray-100 overflow-auto p-8"
+          className="flex-1 overflow-auto p-8 bg-gray-50"
           onDrop={handleDrop}
           onDragOver={handleDragOver}
         >
-          {saveSuccess && (
-            <Alert className="mb-4 bg-green-50 text-green-800 border-green-200">
-              <Check className="h-4 w-4" />
-              <AlertDescription>Page saved successfully!</AlertDescription>
-            </Alert>
-          )}
-
-          {saveError && (
-            <Alert variant="destructive" className="mb-4">
-              <AlertCircle className="h-4 w-4" />
-              <AlertDescription>Failed to save page. Please try again.</AlertDescription>
-            </Alert>
-          )}
-
-          <div className="bg-white min-h-[1000px] w-full max-w-5xl mx-auto shadow-md rounded-md p-8">
-            {/* This would be the actual editable canvas */}
-            <h1 className="text-3xl font-bold mb-6">{pageName}</h1>
-            <div className="border-2 border-dashed border-gray-300 rounded-md p-8 text-center text-gray-500">
-              Drag and drop elements here to build your page
-            </div>
+          {/* Add your canvas content here */}
+          <div className="min-h-[calc(100vh-12rem)] bg-white rounded-lg shadow-sm p-8">
+            {/* This is where dragged elements would be rendered */}
+            <p className="text-gray-400 text-center">
+              Drag and drop elements from the left panel to start building your page
+            </p>
           </div>
         </div>
       </div>
 
-      {/* Right Panel (Properties) */}
-      {showRightPanel && selectedElement && (
-        <div className="w-64 bg-white border-l border-gray-200">
-          <div className="p-4 border-b border-gray-200 flex justify-between items-center">
-            <h3 className="font-medium">Properties</h3>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setShowRightPanel(false)}
-            >
-              <ChevronRight className="h-5 w-5" />
-            </Button>
+      {/* Save Dialog */}
+      <Dialog open={showSaveDialog} onOpenChange={setShowSaveDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Save Page</DialogTitle>
+            <DialogDescription>
+              Configure your page settings before saving.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="page-name">Page Name</Label>
+              <Input
+                id="page-name"
+                value={pageName}
+                onChange={(e) => setPageName(e.target.value)}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="page-slug">URL Slug</Label>
+              <Input
+                id="page-slug"
+                value={pageSlug}
+                onChange={(e) => setPageSlug(e.target.value)}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="page-status">Status</Label>
+              <Select
+                value={pageStatus}
+                onValueChange={(value) => setPageStatus(value)}
+              >
+                <SelectTrigger id="page-status">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="draft">Draft</SelectItem>
+                  <SelectItem value="published">Published</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
-          <div className="p-4">
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="element-id">Element Type</Label>
-                <Input id="element-id" value={selectedElement} readOnly />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="element-class">CSS Classes</Label>
-                <Input id="element-class" placeholder="Add CSS classes" />
-              </div>
-              <Separator />
-              <div className="space-y-2">
-                <Label>Dimensions</Label>
-                <div className="grid grid-cols-2 gap-2">
-                  <div>
-                    <Label htmlFor="width" className="text-xs">
-                      Width
-                    </Label>
-                    <Input id="width" placeholder="Auto" />
-                  </div>
-                  <div>
-                    <Label htmlFor="height" className="text-xs">
-                      Height
-                    </Label>
-                    <Input id="height" placeholder="Auto" />
-                  </div>
-                </div>
-              </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowSaveDialog(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleSavePage}>Save Changes</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Success Message */}
+      {saveSuccess && (
+        <div className="fixed bottom-4 right-4">
+          <Alert className="bg-green-50 text-green-800 border-green-200">
+            <CheckCircle className="h-4 w-4" />
+            <AlertDescription>Page saved successfully!</AlertDescription>
+          </Alert>
+        </div>
+      )}
+
+      {/* Error Message */}
+      {saveError && (
+        <div className="fixed bottom-4 right-4">
+          <Alert className="bg-red-50 text-red-800 border-red-200">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>Failed to save page. Please try again.</AlertDescription>
+          </Alert>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default PageEditor;
