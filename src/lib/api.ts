@@ -244,28 +244,37 @@ export const updateWithdrawalStatus = async (
   });
 };
 
-export const createInvestmentPlan = async (plan: any) => {
-  return handleApiRequest(async () => {
+export const createInvestmentPlan = async (plan: Omit<InvestmentPlan, "id">): Promise<InvestmentPlan> {
+  try {
     const { data, error } = await supabase
       .from("investment_plans")
       .insert([plan])
-      .select();
-
-    if (error) throw error;
-    return data[0];
-  });
-};
-
-export const updateInvestmentPlan = async (planId: string, updates: any) => {
-  return handleApiRequest(async () => {
-    const { data, error } = await supabase
-      .from("investment_plans")
-      .update(updates)
-      .eq("id", planId);
+      .select()
+      .single();
 
     if (error) throw error;
     return data;
-  });
+  } catch (error) {
+    console.error("Error creating investment plan:", error);
+    throw error;
+  }
+};
+
+export const updateInvestmentPlan = async (id: string, plan: Partial<InvestmentPlan>): Promise<InvestmentPlan> {
+  try {
+    const { data, error } = await supabase
+      .from("investment_plans")
+      .update(plan)
+      .eq("id", id)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  } catch (error) {
+    console.error("Error updating investment plan:", error);
+    throw error;
+  }
 };
 
 export const createRank = async (rank: any) => {
@@ -326,39 +335,6 @@ export const updateSystemSettings = async (key: string, value: any) => {
 };
 
 // Investment Plan Management
-export async function createInvestmentPlan(plan: Omit<InvestmentPlan, "id">): Promise<InvestmentPlan> {
-  try {
-    const { data, error } = await supabase
-      .from("investment_plans")
-      .insert([plan])
-      .select()
-      .single();
-
-    if (error) throw error;
-    return data;
-  } catch (error) {
-    console.error("Error creating investment plan:", error);
-    throw error;
-  }
-}
-
-export async function updateInvestmentPlan(id: string, plan: Partial<InvestmentPlan>): Promise<InvestmentPlan> {
-  try {
-    const { data, error } = await supabase
-      .from("investment_plans")
-      .update(plan)
-      .eq("id", id)
-      .select()
-      .single();
-
-    if (error) throw error;
-    return data;
-  } catch (error) {
-    console.error("Error updating investment plan:", error);
-    throw error;
-  }
-}
-
 export async function deleteInvestmentPlan(id: string): Promise<void> {
   try {
     const { error } = await supabase

@@ -32,19 +32,23 @@ const HomePage = () => {
                 network and unlock unlimited earning potential.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
-                <Button
-                  size="lg"
-                  className="bg-white text-blue-700 hover:bg-blue-50"
-                >
-                  Get Started
-                </Button>
-                <Button
-                  size="lg"
-                  variant="outline"
-                  className="border-white text-white hover:bg-blue-700"
-                >
-                  Learn More
-                </Button>
+                <Link to="/register">
+                  <Button
+                    size="lg"
+                    className="bg-white text-blue-700 hover:bg-blue-50"
+                  >
+                    Get Started
+                  </Button>
+                </Link>
+                <Link to="#features">
+                  <Button
+                    size="lg"
+                    variant="outline"
+                    className="border-white text-white hover:bg-blue-700"
+                  >
+                    Learn More
+                  </Button>
+                </Link>
               </div>
             </div>
             <div className="hidden md:block">
