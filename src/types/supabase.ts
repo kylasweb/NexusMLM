@@ -9,7 +9,353 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      airdrop_claims: {
+        Row: {
+          airdrop_id: string
+          amount: number
+          created_at: string | null
+          id: string
+          status: string | null
+          transaction_id: string | null
+          user_id: string
+        }
+        Insert: {
+          airdrop_id: string
+          amount: number
+          created_at?: string | null
+          id?: string
+          status?: string | null
+          transaction_id?: string | null
+          user_id: string
+        }
+        Update: {
+          airdrop_id?: string
+          amount?: number
+          created_at?: string | null
+          id?: string
+          status?: string | null
+          transaction_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "airdrop_claims_airdrop_id_fkey"
+            columns: ["airdrop_id"]
+            isOneToOne: false
+            referencedRelation: "airdrops"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "airdrop_claims_transaction_id_fkey"
+            columns: ["transaction_id"]
+            isOneToOne: false
+            referencedRelation: "token_transactions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      airdrops: {
+        Row: {
+          airdrop_type: string | null
+          amount_per_user: number
+          created_at: string | null
+          created_by: string | null
+          criteria: Json | null
+          description: string | null
+          end_date: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          start_date: string
+          token_id: string
+          total_amount: number
+          updated_at: string | null
+        }
+        Insert: {
+          airdrop_type?: string | null
+          amount_per_user: number
+          created_at?: string | null
+          created_by?: string | null
+          criteria?: Json | null
+          description?: string | null
+          end_date?: string | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          start_date: string
+          token_id: string
+          total_amount: number
+          updated_at?: string | null
+        }
+        Update: {
+          airdrop_type?: string | null
+          amount_per_user?: number
+          created_at?: string | null
+          created_by?: string | null
+          criteria?: Json | null
+          description?: string | null
+          end_date?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          start_date?: string
+          token_id?: string
+          total_amount?: number
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "airdrops_token_id_fkey"
+            columns: ["token_id"]
+            isOneToOne: false
+            referencedRelation: "tokens"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      faucet_claims: {
+        Row: {
+          amount: number
+          created_at: string | null
+          faucet_id: string
+          id: string
+          transaction_id: string | null
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string | null
+          faucet_id: string
+          id?: string
+          transaction_id?: string | null
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string | null
+          faucet_id?: string
+          id?: string
+          transaction_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "faucet_claims_faucet_id_fkey"
+            columns: ["faucet_id"]
+            isOneToOne: false
+            referencedRelation: "faucets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "faucet_claims_transaction_id_fkey"
+            columns: ["transaction_id"]
+            isOneToOne: false
+            referencedRelation: "token_transactions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      faucets: {
+        Row: {
+          amount_per_claim: number
+          claim_interval_hours: number
+          created_at: string | null
+          created_by: string | null
+          description: string | null
+          end_date: string | null
+          id: string
+          is_active: boolean | null
+          max_claims_per_user: number | null
+          name: string
+          start_date: string | null
+          token_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          amount_per_claim: number
+          claim_interval_hours: number
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          end_date?: string | null
+          id?: string
+          is_active?: boolean | null
+          max_claims_per_user?: number | null
+          name: string
+          start_date?: string | null
+          token_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          amount_per_claim?: number
+          claim_interval_hours?: number
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          end_date?: string | null
+          id?: string
+          is_active?: boolean | null
+          max_claims_per_user?: number | null
+          name?: string
+          start_date?: string | null
+          token_id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "faucets_token_id_fkey"
+            columns: ["token_id"]
+            isOneToOne: false
+            referencedRelation: "tokens"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      token_transactions: {
+        Row: {
+          amount: number
+          created_at: string | null
+          description: string | null
+          id: string
+          reference_id: string | null
+          status: string | null
+          token_id: string
+          transaction_type: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          reference_id?: string | null
+          status?: string | null
+          token_id: string
+          transaction_type: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          reference_id?: string | null
+          status?: string | null
+          token_id?: string
+          transaction_type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "token_transactions_token_id_fkey"
+            columns: ["token_id"]
+            isOneToOne: false
+            referencedRelation: "tokens"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tokens: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          description: string | null
+          id: string
+          is_active: boolean | null
+          logo_url: string | null
+          name: string
+          symbol: string
+          total_supply: number
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          logo_url?: string | null
+          name: string
+          symbol: string
+          total_supply: number
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          logo_url?: string | null
+          name?: string
+          symbol?: string
+          total_supply?: number
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      user_tokens: {
+        Row: {
+          balance: number
+          created_at: string | null
+          id: string
+          token_id: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          balance?: number
+          created_at?: string | null
+          id?: string
+          token_id: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          balance?: number
+          created_at?: string | null
+          id?: string
+          token_id?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_tokens_token_id_fkey"
+            columns: ["token_id"]
+            isOneToOne: false
+            referencedRelation: "tokens"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      users: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          email: string | null
+          full_name: string | null
+          id: string
+          updated_at: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id: string
+          updated_at?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

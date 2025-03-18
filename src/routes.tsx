@@ -14,6 +14,11 @@ import KYCVerification from "./components/kyc/KYCVerification";
 import Leaderboard from "./components/gamification/Leaderboard";
 import WebsiteEditor from "./components/visual-editor/WebsiteEditor";
 import TeamManagement from "./components/team/TeamManagement";
+import TokenManagement from "./components/tokens/TokenManagement";
+import FaucetManagement from "./components/tokens/FaucetManagement";
+import AirdropManagement from "./components/tokens/AirdropManagement";
+import UserTokens from "./components/tokens/UserTokens";
+import TokenClaimPage from "./components/tokens/TokenClaimPage";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import { ErrorBoundary } from "./components/error-boundary";
 
@@ -119,6 +124,47 @@ const routes: RouteObject[] = [
     element: (
       <ProtectedRoute>
         <WebsiteEditor />
+      </ProtectedRoute>
+    ),
+  },
+  // Token Management Routes
+  {
+    path: "/tokens/manage",
+    element: (
+      <ProtectedRoute>
+        <TokenManagement />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/tokens/faucets",
+    element: (
+      <ProtectedRoute>
+        <FaucetManagement />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/tokens/airdrops",
+    element: (
+      <ProtectedRoute>
+        <AirdropManagement />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/tokens/my-tokens",
+    element: (
+      <ProtectedRoute>
+        <UserTokens />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/tokens/claim",
+    element: (
+      <ProtectedRoute>
+        <TokenClaimPage />
       </ProtectedRoute>
     ),
   },
