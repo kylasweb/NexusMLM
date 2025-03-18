@@ -272,48 +272,48 @@ const PageEditor = ({ pageId, isPreview = false }: PageEditorProps) => {
             <TabsList className="w-full">
               <TabsTrigger value="elements" className="flex-1">
                 Elements
-              </TabsTrigger>
+                </TabsTrigger>
               <TabsTrigger value="pages" className="flex-1">
                 Pages
-              </TabsTrigger>
-            </TabsList>
+                </TabsTrigger>
+              </TabsList>
 
             <TabsContent value="elements" className="mt-4">
               <div className="space-y-4">
-                {elementCategories.map((category) => (
+                    {elementCategories.map((category) => (
                   <div key={category.id}>
                     <button
                       className={`flex items-center w-full p-2 rounded-lg text-sm ${
-                        activeCategory === category.id
+                          activeCategory === category.id
                           ? "bg-blue-50 text-blue-600"
                           : "hover:bg-gray-50"
                       }`}
-                      onClick={() => setActiveCategory(category.id)}
-                    >
-                      {category.icon}
+                        onClick={() => setActiveCategory(category.id)}
+                      >
+                        {category.icon}
                       <span className="ml-2">{category.name}</span>
                     </button>
-                  </div>
-                ))}
+                      </div>
+                    ))}
               </div>
             </TabsContent>
 
             <TabsContent value="pages" className="mt-4">
               <div className="space-y-4">
-                {savedPages.map((page) => (
-                  <div
-                    key={page.id}
+                    {savedPages.map((page) => (
+                      <div
+                        key={page.id}
                     className="flex items-center justify-between p-2 hover:bg-gray-50 rounded-lg"
-                  >
-                    <div>
+                      >
+                          <div>
                       <p className="font-medium">{page.name}</p>
                       <p className="text-sm text-gray-500">/{page.slug}</p>
-                    </div>
-                    <Badge
+                          </div>
+                            <Badge
                       variant={page.status === "published" ? "default" : "secondary"}
-                    >
-                      {page.status}
-                    </Badge>
+                            >
+                              {page.status}
+                            </Badge>
                   </div>
                 ))}
               </div>
@@ -363,10 +363,10 @@ const PageEditor = ({ pageId, isPreview = false }: PageEditorProps) => {
               >
                 <Save className="h-4 w-4 mr-2" />
                 Save
-              </Button>
-            </div>
-          </div>
-        </div>
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
 
         {/* Canvas Area */}
         <div
@@ -381,8 +381,8 @@ const PageEditor = ({ pageId, isPreview = false }: PageEditorProps) => {
               Drag and drop elements from the left panel to start building your page
             </p>
           </div>
-        </div>
-      </div>
+                  </div>
+                </div>
 
       {/* Save Dialog */}
       <Dialog open={showSaveDialog} onOpenChange={setShowSaveDialog}>
@@ -395,39 +395,39 @@ const PageEditor = ({ pageId, isPreview = false }: PageEditorProps) => {
           </DialogHeader>
 
           <div className="space-y-4 py-4">
-            <div className="space-y-2">
+                  <div className="space-y-2">
               <Label htmlFor="page-name">Page Name</Label>
-              <Input
+                    <Input
                 id="page-name"
-                value={pageName}
-                onChange={(e) => setPageName(e.target.value)}
-              />
-            </div>
+                      value={pageName}
+                      onChange={(e) => setPageName(e.target.value)}
+                    />
+                  </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="page-slug">URL Slug</Label>
-              <Input
-                id="page-slug"
-                value={pageSlug}
-                onChange={(e) => setPageSlug(e.target.value)}
-              />
-            </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="page-slug">URL Slug</Label>
+                    <Input
+                      id="page-slug"
+                      value={pageSlug}
+                      onChange={(e) => setPageSlug(e.target.value)}
+                    />
+                  </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="page-status">Status</Label>
-              <Select
-                value={pageStatus}
+                  <div className="space-y-2">
+                    <Label htmlFor="page-status">Status</Label>
+                    <Select
+                      value={pageStatus}
                 onValueChange={(value) => setPageStatus(value)}
-              >
+                    >
                 <SelectTrigger id="page-status">
                   <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="draft">Draft</SelectItem>
-                  <SelectItem value="published">Published</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="draft">Draft</SelectItem>
+                        <SelectItem value="published">Published</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
           </div>
 
           <DialogFooter>
@@ -440,25 +440,25 @@ const PageEditor = ({ pageId, isPreview = false }: PageEditorProps) => {
       </Dialog>
 
       {/* Success Message */}
-      {saveSuccess && (
+          {saveSuccess && (
         <div className="fixed bottom-4 right-4">
           <Alert className="bg-green-50 text-green-800 border-green-200">
             <CheckCircle className="h-4 w-4" />
-            <AlertDescription>Page saved successfully!</AlertDescription>
-          </Alert>
+              <AlertDescription>Page saved successfully!</AlertDescription>
+            </Alert>
         </div>
-      )}
+          )}
 
       {/* Error Message */}
-      {saveError && (
+          {saveError && (
         <div className="fixed bottom-4 right-4">
           <Alert className="bg-red-50 text-red-800 border-red-200">
-            <AlertCircle className="h-4 w-4" />
-            <AlertDescription>Failed to save page. Please try again.</AlertDescription>
-          </Alert>
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>Failed to save page. Please try again.</AlertDescription>
+            </Alert>
         </div>
       )}
-    </div>
+      </div>
   );
 };
 

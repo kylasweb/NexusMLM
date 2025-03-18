@@ -21,6 +21,8 @@ import UserTokens from "./components/tokens/UserTokens";
 import TokenClaimPage from "./components/tokens/TokenClaimPage";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import { ErrorBoundary } from "./components/error-boundary";
+import PlanManagement from "./components/admin/PlanManagement";
+import AdminRoute from "./components/auth/AdminRoute";
 
 const routes: RouteObject[] = [
   {
@@ -123,7 +125,9 @@ const routes: RouteObject[] = [
     path: "/website-editor",
     element: (
       <ProtectedRoute>
-        <WebsiteEditor />
+        <AdminRoute>
+          <WebsiteEditor />
+        </AdminRoute>
       </ProtectedRoute>
     ),
   },
@@ -165,6 +169,16 @@ const routes: RouteObject[] = [
     element: (
       <ProtectedRoute>
         <TokenClaimPage />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/admin/plans",
+    element: (
+      <ProtectedRoute>
+        <AdminRoute>
+          <PlanManagement />
+        </AdminRoute>
       </ProtectedRoute>
     ),
   },

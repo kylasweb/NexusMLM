@@ -311,3 +311,159 @@ export const updateSystemSettings = async (key: string, value: any) => {
     return data;
   });
 };
+
+// Investment Plan Management
+export interface InvestmentPlan {
+  id: string;
+  name: string;
+  minAmount: number;
+  maxAmount: number;
+  roi: number;
+  duration: number;
+  status: "active" | "inactive";
+}
+
+export async function getInvestmentPlans(): Promise<InvestmentPlan[]> {
+  try {
+    const { data, error } = await supabase
+      .from("investment_plans")
+      .select("*")
+      .order("minAmount", { ascending: true });
+
+    if (error) throw error;
+    return data || [];
+  } catch (error) {
+    console.error("Error fetching investment plans:", error);
+    throw error;
+  }
+}
+
+export async function createInvestmentPlan(plan: Omit<InvestmentPlan, "id">): Promise<InvestmentPlan> {
+  try {
+    const { data, error } = await supabase
+      .from("investment_plans")
+      .insert([plan])
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  } catch (error) {
+    console.error("Error creating investment plan:", error);
+    throw error;
+  }
+}
+
+export async function updateInvestmentPlan(id: string, plan: Partial<InvestmentPlan>): Promise<InvestmentPlan> {
+  try {
+    const { data, error } = await supabase
+      .from("investment_plans")
+      .update(plan)
+      .eq("id", id)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  } catch (error) {
+    console.error("Error updating investment plan:", error);
+    throw error;
+  }
+}
+
+export async function deleteInvestmentPlan(id: string): Promise<void> {
+  try {
+    const { error } = await supabase
+      .from("investment_plans")
+      .delete()
+      .eq("id", id);
+
+    if (error) throw error;
+  } catch (error) {
+    console.error("Error deleting investment plan:", error);
+    throw error;
+  }
+}
+
+// Page Templates API
+export interface PageTemplate {
+  id: string;
+  name: string;
+  thumbnail: string;
+  content: any;
+  created_at: string;
+  updated_at: string;
+}
+
+export async function getPageTemplates(): Promise<PageTemplate[]> {
+  try {
+    const { data, error } = await supabase
+      .from('page_templates')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    return data || [];
+  } catch (error) {
+    console.error('Error fetching page templates:', error);
+    throw error;
+  }
+}
+
+export async function createPageTemplate(template: Partial<PageTemplate>): Promise<PageTemplate> {
+  try {
+    const { data, error } = await supabase
+      .from('page_templates')
+      .insert({
+        name: template.name || 'New Page',
+        thumbnail: template.thumbnail,
+        content: template.content || [],
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      })
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  } catch (error) {
+    console.error('Error creating page template:', error);
+    throw error;
+  }
+}
+
+export async function updatePageTemplate(id: string, template: Partial<PageTemplate>): Promise<PageTemplate> {
+  try {
+    const { data, error } = await supabase
+      .from('page_templates')
+      .update({
+        name: template.name,
+        thumbnail: template.thumbnail,
+        content: template.content,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  } catch (error) {
+    console.error('Error updating page template:', error);
+    throw error;
+  }
+}
+
+export async function deletePageTemplate(id: string): Promise<void> {
+  try {
+    const { error } = await supabase
+      .from('page_templates')
+      .delete()
+      .eq('id', id);
+
+    if (error) throw error;
+  } catch (error) {
+    console.error('Error deleting page template:', error);
+    throw error;
+  }
+}

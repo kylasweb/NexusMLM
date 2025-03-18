@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useToast } from "@/components/ui/use-toast";
 import {
   Users,
   DollarSign,
@@ -21,9 +22,73 @@ import {
   X,
 } from "lucide-react";
 import DashboardLayout from "../layout/DashboardLayout";
+import { updateSystemSettings, getSystemSettings } from "@/lib/api";
 
 const AdminDashboard = () => {
   const [selectedTab, setSelectedTab] = useState("users");
+  const [isLoading, setIsLoading] = useState(false);
+  const { toast } = useToast();
+
+  // System Settings State
+  const [systemSettings, setSystemSettings] = useState({
+    site_name: "MLM Matrix",
+    admin_email: "admin@example.com",
+    currency: "USD",
+    timezone: "UTC",
+    require_kyc: "yes",
+    min_withdrawal: "50",
+    withdrawal_fee: "2.5",
+    enable_2fa: "no"
+  });
+
+  // Load system settings on component mount
+  useEffect(() => {
+    const loadSettings = async () => {
+      try {
+        const settings = await getSystemSettings();
+        if (settings) {
+          setSystemSettings(settings);
+        }
+      } catch (error) {
+        console.error("Error loading settings:", error);
+        toast({
+          title: "Error",
+          description: "Failed to load system settings",
+          variant: "destructive",
+        });
+      }
+    };
+    loadSettings();
+  }, []);
+
+  // Handle system settings save
+  const handleSaveSettings = async () => {
+    try {
+      setIsLoading(true);
+      await updateSystemSettings("general", systemSettings);
+      toast({
+        title: "Success",
+        description: "System settings updated successfully",
+      });
+    } catch (error) {
+      console.error("Error saving settings:", error);
+      toast({
+        title: "Error",
+        description: "Failed to save system settings",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Handle system settings change
+  const handleSettingChange = (key: string, value: string) => {
+    setSystemSettings(prev => ({
+      ...prev,
+      [key]: value
+    }));
+  };
 
   // Mock data for demonstration
   const mockUsers = [
@@ -503,89 +568,49 @@ const AdminDashboard = () => {
           </TabsContent>
 
           {/* Investment Plans Tab */}
-          <TabsContent value="plans" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <div className="flex justify-between items-center">
-                  <CardTitle>Investment Plans</CardTitle>
-                  <Button>
-                    <Plus className="mr-2 h-4 w-4" /> Create New Plan
-                  </Button>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="overflow-x-auto">
-                  <table className="w-full">
-                    <thead>
-                      <tr className="bg-gray-50 text-left">
-                        <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Plan Name
-                        </th>
-                        <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Min Amount
-                        </th>
-                        <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Max Amount
-                        </th>
-                        <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          ROI
-                        </th>
-                        <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Duration
-                        </th>
-                        <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Status
-                        </th>
-                        <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Actions
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-200">
-                      {mockPlans.map((plan) => (
-                        <tr key={plan.id} className="hover:bg-gray-50">
-                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                            {plan.name}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            {plan.minAmount}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            {plan.maxAmount}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-green-600 font-medium">
-                            {plan.roi}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            {plan.duration}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <Badge className={getStatusBadgeColor(plan.status)}>
-                              {plan.status.charAt(0).toUpperCase() +
-                                plan.status.slice(1)}
-                            </Badge>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <div className="flex space-x-2">
-                              <Button size="sm" variant="outline">
-                                Edit
-                              </Button>
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                className="text-red-600 hover:text-red-800"
-                              >
-                                Disable
-                              </Button>
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </CardContent>
-            </Card>
+          <TabsContent value="plans" className="space-y-4">
+            <div className="flex justify-between items-center">
+              <h2 className="text-xl font-semibold">Investment Plans</h2>
+              <Button onClick={() => window.location.href = "/admin/plans"}>
+                <Plus className="mr-2 h-4 w-4" /> Manage Plans
+              </Button>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {mockPlans.map((plan) => (
+                <Card key={plan.id}>
+                  <CardHeader>
+                    <div className="flex justify-between items-start">
+                      <CardTitle className="text-lg">{plan.name}</CardTitle>
+                      <Badge
+                        variant={plan.status === "active" ? "default" : "secondary"}
+                      >
+                        {plan.status}
+                      </Badge>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-2">
+                      <div className="flex justify-between">
+                        <span className="text-sm text-gray-500">Min Amount:</span>
+                        <span className="font-medium">{plan.minAmount}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-sm text-gray-500">Max Amount:</span>
+                        <span className="font-medium">{plan.maxAmount}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-sm text-gray-500">ROI:</span>
+                        <span className="font-medium">{plan.roi}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-sm text-gray-500">Duration:</span>
+                        <span className="font-medium">{plan.duration}</span>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
           </TabsContent>
 
           {/* Rank Management Tab */}
@@ -969,20 +994,27 @@ Levels 6-10: 1%"
                       <h3 className="text-lg font-medium">General Settings</h3>
                       <div className="space-y-2">
                         <Label htmlFor="site_name">Site Name</Label>
-                        <Input id="site_name" defaultValue="MLM Matrix" />
+                        <Input 
+                          id="site_name" 
+                          value={systemSettings.site_name}
+                          onChange={(e) => handleSettingChange("site_name", e.target.value)}
+                        />
                       </div>
                       <div className="space-y-2">
                         <Label htmlFor="admin_email">Admin Email</Label>
                         <Input
                           id="admin_email"
                           type="email"
-                          defaultValue="admin@example.com"
+                          value={systemSettings.admin_email}
+                          onChange={(e) => handleSettingChange("admin_email", e.target.value)}
                         />
                       </div>
                       <div className="space-y-2">
                         <Label htmlFor="currency">Default Currency</Label>
                         <select
                           id="currency"
+                          value={systemSettings.currency}
+                          onChange={(e) => handleSettingChange("currency", e.target.value)}
                           className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                         >
                           <option value="USD">USD ($)</option>
@@ -995,6 +1027,8 @@ Levels 6-10: 1%"
                         <Label htmlFor="timezone">Timezone</Label>
                         <select
                           id="timezone"
+                          value={systemSettings.timezone}
+                          onChange={(e) => handleSettingChange("timezone", e.target.value)}
                           className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                         >
                           <option value="UTC">UTC</option>
@@ -1013,6 +1047,8 @@ Levels 6-10: 1%"
                         </Label>
                         <select
                           id="require_kyc"
+                          value={systemSettings.require_kyc}
+                          onChange={(e) => handleSettingChange("require_kyc", e.target.value)}
                           className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                         >
                           <option value="yes">Yes</option>
@@ -1026,7 +1062,8 @@ Levels 6-10: 1%"
                         <Input
                           id="min_withdrawal"
                           type="number"
-                          defaultValue="50"
+                          value={systemSettings.min_withdrawal}
+                          onChange={(e) => handleSettingChange("min_withdrawal", e.target.value)}
                         />
                       </div>
                       <div className="space-y-2">
@@ -1036,13 +1073,16 @@ Levels 6-10: 1%"
                         <Input
                           id="withdrawal_fee"
                           type="number"
-                          defaultValue="2.5"
+                          value={systemSettings.withdrawal_fee}
+                          onChange={(e) => handleSettingChange("withdrawal_fee", e.target.value)}
                         />
                       </div>
                       <div className="space-y-2">
                         <Label htmlFor="enable_2fa">Enable 2FA for Admin</Label>
                         <select
                           id="enable_2fa"
+                          value={systemSettings.enable_2fa}
+                          onChange={(e) => handleSettingChange("enable_2fa", e.target.value)}
                           className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                         >
                           <option value="yes">Yes</option>
@@ -1053,7 +1093,9 @@ Levels 6-10: 1%"
                   </div>
 
                   <div className="pt-4 border-t border-gray-200">
-                    <Button>Save System Settings</Button>
+                    <Button onClick={handleSaveSettings} disabled={isLoading}>
+                      {isLoading ? "Saving..." : "Save System Settings"}
+                    </Button>
                   </div>
                 </div>
               </CardContent>

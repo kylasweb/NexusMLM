@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useCallback, useRef, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useToast } from "@/components/ui/use-toast";
 import {
   Layout,
   Type,
@@ -33,42 +34,217 @@ import {
   Plus,
   Trash,
   Move,
+  Undo,
+  Redo,
+  Download,
+  History,
 } from "lucide-react";
 import DashboardLayout from "../layout/DashboardLayout";
+import { supabase } from "@/lib/supabase";
+import { PageTemplate, getPageTemplates, createPageTemplate, updatePageTemplate, deletePageTemplate } from "@/lib/api";
+
+interface EditorState {
+  elements: any[];
+  selectedElement: string | null;
+  history: any[];
+  currentHistoryIndex: number;
+}
 
 const WebsiteEditor = () => {
+  const { toast } = useToast();
   const [activePanel, setActivePanel] = useState("elements");
   const [showLeftPanel, setShowLeftPanel] = useState(true);
-  const [selectedElement, setSelectedElement] = useState<string | null>(null);
+  const [isPreviewMode, setIsPreviewMode] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [currentPage, setCurrentPage] = useState<PageTemplate | null>(null);
+  const [pageTemplates, setPageTemplates] = useState<PageTemplate[]>([]);
+  const editorRef = useRef<HTMLDivElement>(null);
+  const [editorState, setEditorState] = useState<EditorState>({
+    elements: [],
+    selectedElement: null,
+    history: [],
+    currentHistoryIndex: -1,
+  });
+
+  // Load page templates from database
+  useEffect(() => {
+    loadPageTemplates();
+  }, []);
+
+  const loadPageTemplates = async () => {
+    try {
+      const templates = await getPageTemplates();
+      setPageTemplates(templates);
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to load page templates",
+        variant: "destructive",
+      });
+    }
+  };
+
+  // Save current state to history
+  const saveToHistory = useCallback((newState: any) => {
+    setEditorState(prev => {
+      const newHistory = [...prev.history.slice(0, prev.currentHistoryIndex + 1), newState];
+      return {
+        ...prev,
+        history: newHistory,
+        currentHistoryIndex: newHistory.length - 1,
+      };
+    });
+  }, []);
+
+  // Undo last action
+  const handleUndo = () => {
+    setEditorState(prev => {
+      if (prev.currentHistoryIndex > 0) {
+        return {
+          ...prev,
+          currentHistoryIndex: prev.currentHistoryIndex - 1,
+          elements: prev.history[prev.currentHistoryIndex - 1],
+        };
+      }
+      return prev;
+    });
+  };
+
+  // Redo last action
+  const handleRedo = () => {
+    setEditorState(prev => {
+      if (prev.currentHistoryIndex < prev.history.length - 1) {
+        return {
+          ...prev,
+          currentHistoryIndex: prev.currentHistoryIndex + 1,
+          elements: prev.history[prev.currentHistoryIndex + 1],
+        };
+      }
+      return prev;
+    });
+  };
+
+  // Save current page
+  const handleSave = async () => {
+    if (!currentPage) return;
+
+    setIsSaving(true);
+    try {
+      const updatedPage = await updatePageTemplate(currentPage.id, {
+        content: editorState.elements,
+      });
+
+      setCurrentPage(updatedPage);
+      toast({
+        title: "Success",
+        description: "Page saved successfully",
+      });
+      loadPageTemplates();
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to save page",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  // Export template
+  const handleExport = () => {
+    const template = {
+      name: currentPage?.name,
+      elements: editorState.elements,
+      exportedAt: new Date().toISOString(),
+    };
+
+    const blob = new Blob([JSON.stringify(template, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${currentPage?.name || 'template'}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  // Handle drag and drop
+  const handleDragStart = (e: React.DragEvent, elementId: string) => {
+    e.dataTransfer.setData("text/plain", elementId);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    const elementId = e.dataTransfer.getData("text/plain");
+    const rect = editorRef.current?.getBoundingClientRect();
+    if (!rect) return;
+
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    const newElement = {
+      id: `${elementId}-${Date.now()}`,
+      type: elementId,
+      position: { x, y },
+      content: "",
+    };
+
+    setEditorState(prev => {
+      const newElements = [...prev.elements, newElement];
+      saveToHistory(newElements);
+      return { ...prev, elements: newElements };
+    });
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+  };
+
+  // Create new page
+  const handleCreatePage = async () => {
+    try {
+      const newPage = await createPageTemplate({
+        name: 'New Page',
+        content: [],
+      });
+
+      setPageTemplates(prev => [newPage, ...prev]);
+      setCurrentPage(newPage);
+      setEditorState(prev => ({ ...prev, elements: [] }));
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to create new page",
+        variant: "destructive",
+      });
+    }
+  };
+
+  // Delete page
+  const handleDeletePage = async (pageId: string) => {
+    try {
+      await deletePageTemplate(pageId);
+      setPageTemplates(prev => prev.filter(page => page.id !== pageId));
+      if (currentPage?.id === pageId) {
+        setCurrentPage(null);
+        setEditorState(prev => ({ ...prev, elements: [] }));
+      }
+      toast({
+        title: "Success",
+        description: "Page deleted successfully",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to delete page",
+        variant: "destructive",
+      });
+    }
+  };
 
   // Mock data for demonstration
-  const pageTemplates = [
-    {
-      id: "1",
-      name: "Home Page",
-      thumbnail:
-        "https://images.unsplash.com/photo-1561070791-2526d30994b5?q=80&w=100&h=100&auto=format&fit=crop",
-    },
-    {
-      id: "2",
-      name: "About Us",
-      thumbnail:
-        "https://images.unsplash.com/photo-1600880292203-757bb62b4baf?q=80&w=100&h=100&auto=format&fit=crop",
-    },
-    {
-      id: "3",
-      name: "Contact",
-      thumbnail:
-        "https://images.unsplash.com/photo-1596524430615-b46475ddff6e?q=80&w=100&h=100&auto=format&fit=crop",
-    },
-    {
-      id: "4",
-      name: "Pricing",
-      thumbnail:
-        "https://images.unsplash.com/photo-1553877522-43269d4ea984?q=80&w=100&h=100&auto=format&fit=crop",
-    },
-  ];
-
   const elementCategories = [
     { id: "layout", name: "Layout", icon: <Layout className="h-4 w-4" /> },
     {
@@ -158,21 +334,6 @@ const WebsiteEditor = () => {
 
   const [activeCategory, setActiveCategory] = useState("layout");
 
-  const handleDragStart = (e: React.DragEvent, elementId: string) => {
-    e.dataTransfer.setData("text/plain", elementId);
-  };
-
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    const elementId = e.dataTransfer.getData("text/plain");
-    console.log(`Dropped element: ${elementId}`);
-    // In a real implementation, this would add the element to the canvas
-  };
-
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-  };
-
   return (
     <DashboardLayout>
       <div className="flex h-full bg-gray-100">
@@ -244,7 +405,7 @@ const WebsiteEditor = () => {
                   <div className="p-4">
                     <div className="flex justify-between items-center mb-4">
                       <h3 className="font-medium">Page Templates</h3>
-                      <Button size="sm" variant="ghost">
+                      <Button size="sm" variant="ghost" onClick={handleCreatePage}>
                         <Plus className="h-4 w-4 mr-1" /> New
                       </Button>
                     </div>
@@ -253,6 +414,13 @@ const WebsiteEditor = () => {
                         <div
                           key={template.id}
                           className="border border-gray-200 rounded-md overflow-hidden hover:border-blue-500 cursor-pointer"
+                          onClick={() => {
+                            setCurrentPage(template);
+                            setEditorState(prev => ({
+                              ...prev,
+                              elements: template.content || []
+                            }));
+                          }}
                         >
                           <img
                             src={template.thumbnail}
@@ -272,30 +440,38 @@ const WebsiteEditor = () => {
                       <h3 className="font-medium">Your Pages</h3>
                     </div>
                     <div className="space-y-2">
-                      <div className="border border-gray-200 rounded-md p-3 hover:bg-gray-50 cursor-pointer">
-                        <div className="flex justify-between items-center">
-                          <span>Home</span>
-                          <Button size="sm" variant="ghost">
-                            <Eye className="h-4 w-4" />
-                          </Button>
+                      {pageTemplates.map((template) => (
+                        <div
+                          key={template.id}
+                          className="border border-gray-200 rounded-md p-3 hover:bg-gray-50 cursor-pointer"
+                        >
+                          <div className="flex justify-between items-center">
+                            <span>{template.name}</span>
+                            <div className="flex space-x-1">
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => {
+                                  setCurrentPage(template);
+                                  setEditorState(prev => ({
+                                    ...prev,
+                                    elements: template.content || []
+                                  }));
+                                }}
+                              >
+                                <Eye className="h-4 w-4" />
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => handleDeletePage(template.id)}
+                              >
+                                <Trash className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </div>
                         </div>
-                      </div>
-                      <div className="border border-gray-200 rounded-md p-3 hover:bg-gray-50 cursor-pointer">
-                        <div className="flex justify-between items-center">
-                          <span>About</span>
-                          <Button size="sm" variant="ghost">
-                            <Eye className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </div>
-                      <div className="border border-gray-200 rounded-md p-3 hover:bg-gray-50 cursor-pointer">
-                        <div className="flex justify-between items-center">
-                          <span>Contact</span>
-                          <Button size="sm" variant="ghost">
-                            <Eye className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </div>
+                      ))}
                     </div>
                   </div>
                 </ScrollArea>
@@ -354,184 +530,130 @@ const WebsiteEditor = () => {
 
         {/* Main Editor Area */}
         <div className="flex-1 flex flex-col">
-          {/* Toolbar */}
-          <div className="bg-white border-b border-gray-200 p-2 flex items-center justify-between">
+          <div className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-4">
             <div className="flex items-center space-x-2">
               <Button
                 variant="ghost"
-                size="icon"
+                size="sm"
                 onClick={() => setShowLeftPanel(!showLeftPanel)}
               >
-                {showLeftPanel ? (
-                  <PanelLeft className="h-5 w-5" />
-                ) : (
-                  <Layers className="h-5 w-5" />
-                )}
+                {showLeftPanel ? <ChevronLeft /> : <ChevronRight />}
               </Button>
-              <Separator orientation="vertical" className="h-6" />
-              <Button variant="ghost" size="icon">
-                <Move className="h-5 w-5" />
-              </Button>
-              <Separator orientation="vertical" className="h-6" />
-              <Button variant="ghost" size="icon">
-                <Bold className="h-5 w-5" />
-              </Button>
-              <Button variant="ghost" size="icon">
-                <Italic className="h-5 w-5" />
-              </Button>
-              <Button variant="ghost" size="icon">
-                <Underline className="h-5 w-5" />
-              </Button>
-              <Separator orientation="vertical" className="h-6" />
-              <Button variant="ghost" size="icon">
-                <AlignLeft className="h-5 w-5" />
-              </Button>
-              <Button variant="ghost" size="icon">
-                <AlignCenter className="h-5 w-5" />
-              </Button>
-              <Button variant="ghost" size="icon">
-                <AlignRight className="h-5 w-5" />
-              </Button>
-              <Separator orientation="vertical" className="h-6" />
-              <Button variant="ghost" size="icon">
-                <Link className="h-5 w-5" />
-              </Button>
-              <Button variant="ghost" size="icon">
-                <Image className="h-5 w-5" />
-              </Button>
+              <h2 className="text-lg font-semibold">
+                {currentPage?.name || 'Select a Page'}
+              </h2>
             </div>
             <div className="flex items-center space-x-2">
-              <Button variant="outline" size="sm">
-                <Eye className="h-4 w-4 mr-2" /> Preview
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleUndo}
+                disabled={editorState.currentHistoryIndex <= 0}
+              >
+                <Undo className="h-4 w-4" />
               </Button>
-              <Button size="sm">
-                <Save className="h-4 w-4 mr-2" /> Save
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleRedo}
+                disabled={editorState.currentHistoryIndex >= editorState.history.length - 1}
+              >
+                <Redo className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setIsPreviewMode(!isPreviewMode)}
+              >
+                <Eye className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleExport}
+              >
+                <Download className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="default"
+                size="sm"
+                onClick={handleSave}
+                disabled={isSaving}
+              >
+                {isSaving ? (
+                  <span className="animate-spin">⌛</span>
+                ) : (
+                  <Save className="h-4 w-4" />
+                )}
               </Button>
             </div>
           </div>
 
-          {/* Canvas */}
           <div
-            className="flex-1 bg-gray-100 overflow-auto p-8"
+            ref={editorRef}
+            className="flex-1 p-4 overflow-auto"
             onDrop={handleDrop}
             onDragOver={handleDragOver}
           >
-            <div className="bg-white min-h-[1000px] w-full max-w-5xl mx-auto shadow-md rounded-md p-8">
-              {/* This would be the actual editable canvas */}
-              <div className="border-2 border-dashed border-gray-300 rounded-md p-8 text-center text-gray-500">
-                Drag and drop elements here to build your page
+            {isPreviewMode ? (
+              <div className="preview-container">
+                {editorState.elements.map((element) => (
+                  <div
+                    key={element.id}
+                    style={{
+                      position: 'absolute',
+                      left: element.position.x,
+                      top: element.position.y,
+                    }}
+                  >
+                    {/* Render element based on type */}
+                    {element.type === 'heading' && <h1>{element.content}</h1>}
+                    {element.type === 'paragraph' && <p>{element.content}</p>}
+                    {element.type === 'image' && <img src={element.content} alt="" />}
+                    {/* Add more element type renderers */}
+                  </div>
+                ))}
               </div>
-            </div>
+            ) : (
+              <div className="editor-container">
+                {editorState.elements.map((element) => (
+                  <div
+                    key={element.id}
+                    className="editor-element"
+                    style={{
+                      position: 'absolute',
+                      left: element.position.x,
+                      top: element.position.y,
+                    }}
+                    onClick={() => setEditorState(prev => ({
+                      ...prev,
+                      selectedElement: element.id
+                    }))}
+                  >
+                    {/* Render element with edit controls */}
+                    {element.type === 'heading' && (
+                      <input
+                        type="text"
+                        value={element.content}
+                        onChange={(e) => {
+                          setEditorState(prev => ({
+                            ...prev,
+                            elements: prev.elements.map(el =>
+                              el.id === element.id
+                                ? { ...el, content: e.target.value }
+                                : el
+                            )
+                          }));
+                        }}
+                      />
+                    )}
+                    {/* Add more element type editors */}
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
-
-        {/* Right Panel (Properties) */}
-        {selectedElement && (
-          <div className="w-64 bg-white border-l border-gray-200">
-            <div className="p-4 border-b border-gray-200 flex justify-between items-center">
-              <h3 className="font-medium">Properties</h3>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setSelectedElement(null)}
-              >
-                <ChevronRight className="h-5 w-5" />
-              </Button>
-            </div>
-            <div className="p-4">
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="element-id">ID</Label>
-                  <Input id="element-id" value={selectedElement} readOnly />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="element-class">Class</Label>
-                  <Input id="element-class" placeholder="Add CSS classes" />
-                </div>
-                <Separator />
-                <div className="space-y-2">
-                  <Label>Dimensions</Label>
-                  <div className="grid grid-cols-2 gap-2">
-                    <div>
-                      <Label htmlFor="width" className="text-xs">
-                        Width
-                      </Label>
-                      <Input id="width" placeholder="Auto" />
-                    </div>
-                    <div>
-                      <Label htmlFor="height" className="text-xs">
-                        Height
-                      </Label>
-                      <Input id="height" placeholder="Auto" />
-                    </div>
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <Label>Margin</Label>
-                  <div className="grid grid-cols-4 gap-1">
-                    <div>
-                      <Label htmlFor="margin-top" className="text-xs">
-                        Top
-                      </Label>
-                      <Input id="margin-top" placeholder="0" />
-                    </div>
-                    <div>
-                      <Label htmlFor="margin-right" className="text-xs">
-                        Right
-                      </Label>
-                      <Input id="margin-right" placeholder="0" />
-                    </div>
-                    <div>
-                      <Label htmlFor="margin-bottom" className="text-xs">
-                        Bottom
-                      </Label>
-                      <Input id="margin-bottom" placeholder="0" />
-                    </div>
-                    <div>
-                      <Label htmlFor="margin-left" className="text-xs">
-                        Left
-                      </Label>
-                      <Input id="margin-left" placeholder="0" />
-                    </div>
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <Label>Padding</Label>
-                  <div className="grid grid-cols-4 gap-1">
-                    <div>
-                      <Label htmlFor="padding-top" className="text-xs">
-                        Top
-                      </Label>
-                      <Input id="padding-top" placeholder="0" />
-                    </div>
-                    <div>
-                      <Label htmlFor="padding-right" className="text-xs">
-                        Right
-                      </Label>
-                      <Input id="padding-right" placeholder="0" />
-                    </div>
-                    <div>
-                      <Label htmlFor="padding-bottom" className="text-xs">
-                        Bottom
-                      </Label>
-                      <Input id="padding-bottom" placeholder="0" />
-                    </div>
-                    <div>
-                      <Label htmlFor="padding-left" className="text-xs">
-                        Left
-                      </Label>
-                      <Input id="padding-left" placeholder="0" />
-                    </div>
-                  </div>
-                </div>
-                <Separator />
-                <Button variant="destructive" className="w-full">
-                  <Trash className="h-4 w-4 mr-2" /> Delete Element
-                </Button>
-              </div>
-            </div>
-          </div>
-        )}
       </div>
     </DashboardLayout>
   );
