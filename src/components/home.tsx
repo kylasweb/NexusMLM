@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 
-const Home = () => {
+export default function Home() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-indigo-100">
       {/* Hero Section */}
@@ -229,6 +229,4 @@ const Home = () => {
       </footer>
     </div>
   );
-};
-
-export default Home;
+}
