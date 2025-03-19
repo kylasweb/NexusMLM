@@ -9,6 +9,9 @@ import { Network, Users, ChevronDown, ChevronUp, Search } from "lucide-react";
 import DashboardLayout from "../layout/DashboardLayout";
 import { MatrixVisualization } from './MatrixVisualization';
 import { MatrixStats } from './MatrixStats';
+import { MatrixPerformance } from './MatrixPerformance';
+import { MatrixOverflow } from './MatrixOverflow';
+import { EnhancedMatrixVisualization } from './EnhancedMatrixVisualization';
 
 interface TeamMember {
   id: string;
@@ -140,115 +143,25 @@ const NetworkVisualization = () => {
           </div>
         )}
 
-        <Tabs defaultValue="binary" className="w-full">
-          <TabsList className="mb-6">
-            <TabsTrigger value="binary">
-              <Network className="mr-2 h-4 w-4" /> Binary Matrix
-            </TabsTrigger>
-            <TabsTrigger value="team">
-              <Users className="mr-2 h-4 w-4" /> Team Members
-            </TabsTrigger>
+        <MatrixPerformance />
+        
+        <Tabs defaultValue="visualization" className="w-full">
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="visualization">Matrix Structure</TabsTrigger>
+            <TabsTrigger value="stats">Statistics</TabsTrigger>
+            <TabsTrigger value="overflow">Overflow & Rebalancing</TabsTrigger>
           </TabsList>
-
-          <TabsContent value="binary" className="space-y-6">
-            <div className="space-y-8">
-              <div>
-                <h2 className="text-2xl font-bold mb-4">Matrix Statistics</h2>
-                <MatrixStats />
-              </div>
-              <div>
-                <h2 className="text-2xl font-bold mb-4">Matrix Structure</h2>
-                <MatrixVisualization />
-              </div>
-            </div>
+          
+          <TabsContent value="visualization" className="mt-4">
+            <EnhancedMatrixVisualization />
           </TabsContent>
-
-          <TabsContent value="team" className="space-y-6">
-            {/* Team Members List */}
-            <Card>
-              <CardHeader>
-                <div className="flex justify-between items-center">
-                  <CardTitle>Team Members</CardTitle>
-                  <div className="relative w-64">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                    <input
-                      type="text"
-                      placeholder="Search members..."
-                      className="pl-10 pr-4 py-2 w-full border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {directReferrals.length > 0 ? (
-                    directReferrals.map((member) => (
-                      <div
-                        key={member.id}
-                        className="flex items-center justify-between p-4 bg-white border rounded-lg shadow-sm hover:shadow-md transition-shadow"
-                      >
-                        <div className="flex items-center">
-                          <div className="w-12 h-12 rounded-full overflow-hidden mr-4">
-                            <img
-                              src={member.avatar}
-                              alt={member.name}
-                              className="w-full h-full object-cover"
-                            />
-                          </div>
-                          <div>
-                            <h4 className="font-medium text-gray-800 text-lg">
-                              {member.name}
-                            </h4>
-                            <div className="flex items-center mt-1">
-                              <Badge
-                                className={
-                                  member.active ? "bg-green-500" : "bg-gray-400"
-                                }
-                              >
-                                {member.active ? "Active" : "Inactive"}
-                              </Badge>
-                              <span className="text-xs text-gray-500 ml-2">
-                                Joined {member.joinDate}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                        <div className="text-right">
-                          <Badge
-                            variant="outline"
-                            className="mb-2 border-blue-300 text-blue-700 px-3 py-1"
-                          >
-                            {member.rank}
-                          </Badge>
-                          <div className="flex space-x-2">
-                            <Button variant="outline" size="sm">
-                              View Details
-                            </Button>
-                            <Button size="sm">Contact</Button>
-                          </div>
-                        </div>
-                      </div>
-                    ))
-                  ) : (
-                    <div className="text-center py-8">
-                      <div className="rounded-full bg-blue-100 p-3 mb-4 mx-auto w-16 h-16 flex items-center justify-center">
-                        <Users className="h-8 w-8 text-blue-600" />
-                      </div>
-                      <h3 className="text-lg font-semibold mb-2">
-                        No Team Members Yet
-                      </h3>
-                      <p className="text-gray-500 max-w-md mx-auto mb-6">
-                        You haven't added any team members to your network yet.
-                        Start building your team by inviting new members.
-                      </p>
-                      <Button>
-                        <Users className="mr-2 h-4 w-4" /> Invite New Members
-                      </Button>
-                    </div>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
+          
+          <TabsContent value="stats" className="mt-4">
+            <MatrixStats />
+          </TabsContent>
+          
+          <TabsContent value="overflow" className="mt-4">
+            <MatrixOverflow />
           </TabsContent>
         </Tabs>
       </div>

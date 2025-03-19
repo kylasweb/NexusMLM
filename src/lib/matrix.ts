@@ -19,6 +19,38 @@ export interface MatrixStats {
   total_volume: number;
 }
 
+export interface MatrixPerformance {
+  total_members: number;
+  active_members: number;
+  total_volume: number;
+  average_level: number;
+  growth_rate: number;
+  balance_ratio: number;
+}
+
+export interface MatrixOverflow {
+  id: string;
+  user_id: string;
+  original_parent_id: string;
+  new_parent_id: string | null;
+  position: 'left' | 'right';
+  level: number;
+  status: 'pending' | 'processed' | 'failed';
+  created_at: string;
+  updated_at: string;
+}
+
+export interface MatrixRebalanceHistory {
+  id: string;
+  user_id: string;
+  old_parent_id: string;
+  new_parent_id: string;
+  position: 'left' | 'right';
+  level: number;
+  reason: string;
+  created_at: string;
+}
+
 export async function getMatrixPosition(userId: string): Promise<MatrixPosition | null> {
   const { data, error } = await supabase
     .from('matrix_positions')
@@ -98,6 +130,43 @@ export async function getMatrixTree(userId: string): Promise<MatrixPosition[]> {
   return data;
 }
 
+export async function getMatrixPerformance(userId: string): Promise<MatrixPerformance> {
+  const { data, error } = await supabase
+    .rpc('get_matrix_performance', { user_id: userId });
+
+  if (error) throw error;
+  return data;
+}
+
+export async function getMatrixOverflow(userId: string): Promise<MatrixOverflow[]> {
+  const { data, error } = await supabase
+    .from('matrix_overflow')
+    .select('*')
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false });
+
+  if (error) throw error;
+  return data;
+}
+
+export async function getMatrixRebalanceHistory(userId: string): Promise<MatrixRebalanceHistory[]> {
+  const { data, error } = await supabase
+    .from('matrix_rebalance_history')
+    .select('*')
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false });
+
+  if (error) throw error;
+  return data;
+}
+
+export async function handleMatrixOverflow(userId: string): Promise<void> {
+  const { error } = await supabase
+    .rpc('handle_matrix_overflow', { user_id: userId });
+
+  if (error) throw error;
+}
+
 export async function rebalanceMatrix(userId: string): Promise<void> {
   const { error } = await supabase
     .rpc('rebalance_matrix', { user_id: userId });
@@ -105,10 +174,12 @@ export async function rebalanceMatrix(userId: string): Promise<void> {
   if (error) throw error;
 }
 
-export async function getMatrixOverflow(userId: string): Promise<MatrixPosition[]> {
-  const { data, error } = await supabase
-    .rpc('get_matrix_overflow', { user_id: userId });
+export async function processMatrixOverflow(userId: string, overflowId: string): Promise<void> {
+  const { error } = await supabase
+    .from('matrix_overflow')
+    .update({ status: 'processed' })
+    .eq('id', overflowId)
+    .eq('user_id', userId);
 
   if (error) throw error;
-  return data;
 } 
