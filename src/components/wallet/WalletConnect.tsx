@@ -1,32 +1,25 @@
 import React, { useState, useEffect } from "react";
+import { ethers } from "ethers";
+import Web3Modal from "web3modal";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import {
-  Wallet,
-  ArrowRightLeft,
-  Copy,
-  ExternalLink,
-  Check,
-} from "lucide-react";
+import { Wallet, ArrowRightLeft, Copy, ExternalLink, Check } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
+
+const web3Modal = new Web3Modal({
+  network: "mainnet",
+  cacheProvider: true,
+  providerOptions: {}
+});
 
 interface WalletConnectProps {
   onConnect?: (address: string) => void;
   onDisconnect?: () => void;
 }
 
-const WalletConnect = ({
-  onConnect,
-  onDisconnect,
-}: WalletConnectProps = {}) => {
+const WalletConnect = ({ onConnect, onDisconnect }: WalletConnectProps = {}) => {
+  const [provider, setProvider] = useState<ethers.providers.Web3Provider | null>(null);
   const [isConnected, setIsConnected] = useState(false);
   const [walletAddress, setWalletAddress] = useState("");
   const [balance, setBalance] = useState("0");
@@ -34,29 +27,29 @@ const WalletConnect = ({
   const { toast } = useToast();
 
   useEffect(() => {
-    // Check if wallet was previously connected
-    const savedAddress = localStorage.getItem("walletAddress");
-    if (savedAddress) {
-      setWalletAddress(savedAddress);
-      setIsConnected(true);
-      setBalance("0.05"); // Mock balance
-      onConnect?.(savedAddress);
+    if (web3Modal.cachedProvider) {
+      connectWallet();
     }
-  }, [onConnect]);
+  }, []);
 
   const connectWallet = async () => {
     try {
-      // Mock wallet connection
-      // In a real implementation, you would use a library like ethers.js or web3.js
-      // to connect to MetaMask or other wallets
-      const mockAddress = "0x71C7656EC7ab88b098defB751B7401B5f6d8976F";
+      const instance = await web3Modal.connect();
+      const provider = new ethers.providers.Web3Provider(instance);
+      const signer = provider.getSigner();
+      const address = await signer.getAddress();
+      const balance = await provider.getBalance(address);
+      const ethBalance = ethers.utils.formatEther(balance);
 
-      setWalletAddress(mockAddress);
+      setProvider(provider);
+      setWalletAddress(address);
+      setBalance(Number(ethBalance).toFixed(4));
       setIsConnected(true);
-      setBalance("0.05"); // Mock balance
-      localStorage.setItem("walletAddress", mockAddress);
+      onConnect?.(address);
 
-      onConnect?.(mockAddress);
+      // Subscribe to accounts change
+      instance.on("accountsChanged", handleAccountsChanged);
+      instance.on("chainChanged", handleChainChanged);
 
       toast({
         title: "Wallet Connected",
@@ -72,12 +65,28 @@ const WalletConnect = ({
     }
   };
 
+  const handleAccountsChanged = async (accounts: string[]) => {
+    if (accounts.length === 0) {
+      disconnectWallet();
+    } else {
+      setWalletAddress(accounts[0]);
+      if (provider) {
+        const balance = await provider.getBalance(accounts[0]);
+        setBalance(ethers.utils.formatEther(balance));
+      }
+    }
+  };
+
+  const handleChainChanged = () => {
+    window.location.reload();
+  };
+
   const disconnectWallet = () => {
+    web3Modal.clearCachedProvider();
+    setProvider(null);
     setIsConnected(false);
     setWalletAddress("");
     setBalance("0");
-    localStorage.removeItem("walletAddress");
-
     onDisconnect?.();
 
     toast({

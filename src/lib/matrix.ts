@@ -124,10 +124,21 @@ export async function updateMatrixVolume(
 
 export async function getMatrixTree(userId: string): Promise<MatrixPosition[]> {
   const { data, error } = await supabase
-    .rpc('get_matrix_tree', { user_id: userId });
+    .from('binary_matrix')
+    .select(`
+      id,
+      user_id,
+      parent_id,
+      position,
+      level,
+      created_at,
+      updated_at
+    `)
+    .eq('user_id', userId)
+    .order('level', { ascending: true });
 
   if (error) throw error;
-  return data;
+  return data || [];
 }
 
 export async function getMatrixPerformance(userId: string): Promise<MatrixPerformance> {
@@ -169,8 +180,8 @@ export async function handleMatrixOverflow(userId: string): Promise<void> {
 
 export async function rebalanceMatrix(userId: string): Promise<void> {
   const { error } = await supabase
-    .rpc('rebalance_matrix', { user_id: userId });
-
+    .rpc('rebalance_matrix', { p_user_id: userId });
+    
   if (error) throw error;
 }
 
@@ -182,4 +193,94 @@ export async function processMatrixOverflow(userId: string, overflowId: string):
     .eq('user_id', userId);
 
   if (error) throw error;
-} 
+}
+
+export async function placeInMatrix(
+  userId: string,
+  sponsorId: string
+): Promise<MatrixPosition> {
+  // Find the best position in the sponsor's downline
+  const { data: sponsorPosition } = await supabase
+    .from('binary_matrix')
+    .select('*')
+    .eq('user_id', sponsorId)
+    .single();
+
+  if (!sponsorPosition) {
+    throw new Error('Sponsor not found in matrix');
+  }
+
+  // Find the first available position in the sponsor's downline
+  const position = await findFirstAvailablePosition(sponsorPosition.id);
+  
+  const { data, error } = await supabase
+    .from('binary_matrix')
+    .insert({
+      user_id: userId,
+      parent_id: position.parentId,
+      position: position.side,
+      level: position.level
+    })
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
+async function findFirstAvailablePosition(startNodeId: string): Promise<{
+  parentId: string;
+  side: 'left' | 'right';
+  level: number;
+}> {
+  const queue: string[] = [startNodeId];
+  
+  while (queue.length > 0) {
+    const currentNodeId = queue.shift()!;
+    
+    // Check left and right positions
+    const { data: children } = await supabase
+      .from('binary_matrix')
+      .select('*')
+      .eq('parent_id', currentNodeId);
+      
+    const hasLeft = children?.some(child => child.position === 'left');
+    const hasRight = children?.some(child => child.position === 'right');
+    
+    if (!hasLeft) {
+      return {
+        parentId: currentNodeId,
+        side: 'left',
+        level: (children?.[0]?.level || 1) + 1
+      };
+    }
+    
+    if (!hasRight) {
+      return {
+        parentId: currentNodeId,
+        side: 'right',
+        level: (children?.[0]?.level || 1) + 1
+      };
+    }
+    
+    // Add children to queue
+    children?.forEach(child => queue.push(child.id));
+  }
+  
+  throw new Error('No available position found');
+}
+
+export async function calculateMatrixCommissions(userId: string): Promise<number> {
+  const { data: stats } = await supabase
+    .rpc('calculate_matrix_stats', { p_user_id: userId });
+    
+  if (!stats) return 0;
+  
+  const weaker_leg_volume = Math.min(
+    stats.left_leg_volume || 0,
+    stats.right_leg_volume || 0
+  );
+  
+  // Apply commission rate (10%)
+  return weaker_leg_volume * 0.1;
+}
