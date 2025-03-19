@@ -14,8 +14,8 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const supabase = createClient(
-    import.meta.env.VITE_SUPABASE_URL,
-    import.meta.env.VITE_SUPABASE_ANON_KEY
+    process.env.VITE_SUPABASE_URL as string,
+    process.env.VITE_SUPABASE_ANON_KEY as string
   );
 
   const [user, setUser] = useState<User | null>(null);
@@ -33,6 +33,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     return () => subscription.unsubscribe();
   }, []);
+
+  const updateProfile = async (data: { username?: string; avatar_url?: string }) => {
+    if (!user) throw new Error('No user logged in');
+
+    const { error } = await supabase
+      .from('profiles')
+      .update(data)
+      .eq('id', user.id)
+      .single();
+
+    if (error) throw error;
+  };
 
   const value = {
     user,
@@ -62,3 +74,5 @@ export function useAuth() {
   }
   return context;
 }
+
+

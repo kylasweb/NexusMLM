@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import AdminLayout from "./layout/AdminLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -16,9 +16,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/components/ui/use-toast";
-import { Search, Filter, Eye } from "lucide-react";
+import { Search, Eye } from "lucide-react";
 
 interface KYCRequest {
   id: string;
@@ -42,12 +41,16 @@ const KYCVerification = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const { toast } = useToast();
 
+  const handleViewRequest = (request: KYCRequest) => {
+    setSelectedRequest(request);
+    setIsViewDialogOpen(true);
+  };
+
   const loadKYCRequests = async () => {
     try {
       const response = await fetch("/api/kyc/requests");
       const data = await response.json();
       
-      // Transform the data to ensure status is of the correct type
       const transformedData = data.map((request: any) => ({
         ...request,
         status: request.status as "pending" | "approved" | "rejected"
@@ -81,6 +84,10 @@ const KYCVerification = () => {
         title: "Success",
         description: `KYC request ${newStatus} successfully`,
       });
+      
+      // Close the dialog after successful status update
+      setIsViewDialogOpen(false);
+      setSelectedRequest(null);
     } catch (error) {
       toast({
         title: "Error",
@@ -148,7 +155,37 @@ const KYCVerification = () => {
             </div>
           </CardHeader>
           <CardContent>
-            {/* Add KYC requests table */}
+            <table className="w-full">
+              <thead>
+                <tr>
+                  <th className="text-left p-4">User</th>
+                  <th className="text-left p-4">Document Type</th>
+                  <th className="text-left p-4">Submission Date</th>
+                  <th className="text-left p-4">Status</th>
+                  <th className="text-left p-4">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {requests.map((request) => (
+                  <tr key={request.id}>
+                    <td className="p-4">{request.userName}</td>
+                    <td className="p-4">{request.documentType}</td>
+                    <td className="p-4">{request.submissionDate}</td>
+                    <td className="p-4">{request.status}</td>
+                    <td className="p-4">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleViewRequest(request)}
+                      >
+                        <Eye className="h-4 w-4 mr-2" />
+                        View
+                      </Button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </CardContent>
         </Card>
 
@@ -159,7 +196,31 @@ const KYCVerification = () => {
             </DialogHeader>
             {selectedRequest && (
               <div className="grid grid-cols-2 gap-4">
-                {/* Add document preview components */}
+                {/* Document preview components */}
+                <div className="col-span-1">
+                  <h3 className="font-medium mb-2">Front of ID</h3>
+                  <img 
+                    src={selectedRequest.documents.front} 
+                    alt="ID Front" 
+                    className="w-full rounded-lg"
+                  />
+                </div>
+                <div className="col-span-1">
+                  <h3 className="font-medium mb-2">Back of ID</h3>
+                  <img 
+                    src={selectedRequest.documents.back} 
+                    alt="ID Back" 
+                    className="w-full rounded-lg"
+                  />
+                </div>
+                <div className="col-span-2">
+                  <h3 className="font-medium mb-2">Selfie with ID</h3>
+                  <img 
+                    src={selectedRequest.documents.selfie} 
+                    alt="Selfie" 
+                    className="w-full rounded-lg"
+                  />
+                </div>
                 <div className="col-span-2 flex justify-end space-x-2">
                   <Button
                     variant="outline"
@@ -183,3 +244,6 @@ const KYCVerification = () => {
 };
 
 export default KYCVerification;
+
+
+

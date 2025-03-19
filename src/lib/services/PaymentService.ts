@@ -1,6 +1,5 @@
 import { supabase } from '@/lib/supabase';
 import Stripe from 'stripe';
-import { ethers } from 'ethers';
 import type { Database } from '@/lib/types/database';
 
 const stripe = new Stripe(process.env.VITE_STRIPE_SECRET_KEY || '', {
@@ -11,8 +10,6 @@ type Tables = Database['public']['Tables'];
 
 // Interface for the database payment_methods table
 type DbPaymentMethod = Tables['payment_methods']['Row'];
-type DbPaymentTransaction = Tables['payment_transactions']['Row'];
-type DbCommissionPayout = Tables['commission_payouts']['Row'];
 
 export interface PaymentMethod {
   id: string;

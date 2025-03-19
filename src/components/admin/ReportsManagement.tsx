@@ -1,22 +1,20 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import AdminLayout from "./layout/AdminLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/components/ui/use-toast";
-import { FileText, Download, RefreshCw, Filter } from "lucide-react";
+import { FileText } from "lucide-react";
 import { DateRange } from "react-day-picker";
 import { DatePickerWithRange } from "@/components/ui/date-picker-with-range";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const ReportsManagement = () => {
   const { toast } = useToast();
-  const [isLoading, setIsLoading] = useState(false);
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
 
   const generateReport = async (type: string) => {
     try {
-      setIsLoading(true);
       // Replace with actual API call
       await fetch(`/api/reports/${type}`, {
         method: "POST",
@@ -33,8 +31,6 @@ const ReportsManagement = () => {
         description: "Failed to generate report",
         variant: "destructive",
       });
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -93,4 +89,6 @@ const ReportsManagement = () => {
 };
 
 export default ReportsManagement;
+
+
 

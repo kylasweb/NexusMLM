@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -42,7 +42,6 @@ interface Withdrawal {
 
 export default function WithdrawalManagement() {
   const [withdrawals, setWithdrawals] = useState<Withdrawal[]>([]);
-  const [loading, setLoading] = useState(true);
   const [selectedWithdrawal, setSelectedWithdrawal] = useState<Withdrawal | null>(
     null
   );
@@ -56,7 +55,6 @@ export default function WithdrawalManagement() {
 
   const loadWithdrawals = async () => {
     try {
-      setLoading(true);
       // Replace with your actual API call
       const response = await fetch("/api/withdrawals");
       const data = await response.json();
@@ -67,8 +65,6 @@ export default function WithdrawalManagement() {
         description: "Failed to load withdrawals",
         variant: "destructive",
       });
-    } finally {
-      setLoading(false);
     }
   };
 

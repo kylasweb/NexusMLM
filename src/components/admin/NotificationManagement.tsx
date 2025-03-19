@@ -1,4 +1,3 @@
-import React, { useState } from "react";
 import AdminLayout from "./layout/AdminLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -7,16 +6,14 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
-import { Bell, Mail, MessageSquare, Send } from "lucide-react";
+import { Send } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const NotificationManagement = () => {
   const { toast } = useToast();
-  const [isLoading, setIsLoading] = useState(false);
 
   const sendNotification = async (type: string) => {
     try {
-      setIsLoading(true);
       // Replace with actual API call
       await fetch("/api/notifications/send", {
         method: "POST",
@@ -33,8 +30,6 @@ const NotificationManagement = () => {
         description: "Failed to send notification",
         variant: "destructive",
       });
-    } finally {
-      setIsLoading(false);
     }
   };
 

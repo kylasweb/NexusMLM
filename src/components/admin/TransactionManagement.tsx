@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -42,7 +42,6 @@ interface Transaction {
 
 export default function TransactionManagement() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
   const [transactionType, setTransactionType] = useState<string>("all");
@@ -54,7 +53,6 @@ export default function TransactionManagement() {
 
   const loadTransactions = async () => {
     try {
-      setLoading(true);
       // Replace with your actual API call
       const response = await fetch("/api/transactions", {
         method: "POST",
@@ -72,8 +70,6 @@ export default function TransactionManagement() {
         description: "Failed to load transactions",
         variant: "destructive",
       });
-    } finally {
-      setLoading(false);
     }
   };
 
