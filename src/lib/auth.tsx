@@ -1,16 +1,22 @@
+import React from 'react';
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { AuthContext } from './AuthContext';
+import { createClient, User } from '@supabase/supabase-js';
+import { supabase } from './supabase';
 
 interface AuthProviderProps {
   children: ReactNode;
 }
 
-export function AuthProvider({ children }: AuthProviderProps) {
-  const supabase = createClient(
-    process.env.VITE_SUPABASE_URL as string,
-    process.env.VITE_SUPABASE_ANON_KEY as string
-  );
+interface AuthContextType {
+  user: User | null;
+  signIn: (email: string, password: string) => Promise<void>;
+  signOut: () => Promise<void>;
+  updateProfile: (data: { username?: string; avatar_url?: string }) => Promise<void>;
+}
 
+export const AuthContext = createContext<AuthContextType | null>(null);
+
+export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
@@ -26,6 +32,19 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
     return () => subscription.unsubscribe();
   }, []);
+
+  const signIn = async (email: string, password: string) => {
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+    if (error) throw error;
+  };
+
+  const signOut = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) throw error;
+  };
 
   const updateProfile = async (data: { username?: string; avatar_url?: string }) => {
     if (!user) throw new Error('No user logged in');
@@ -56,6 +75,7 @@ export function useAuth() {
   }
   return context;
 }
+
 
 
 
