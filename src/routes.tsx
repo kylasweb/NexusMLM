@@ -1,187 +1,69 @@
-import { Navigate, RouteObject } from "react-router-dom";
-import LoginForm from "./components/auth/LoginForm";
-import RegisterForm from "./components/auth/RegisterForm";
-import ForgotPasswordForm from "./components/auth/ForgotPasswordForm";
-import ResetPasswordForm from "./components/auth/ResetPasswordForm";
-import DashboardOverview from "./components/dashboard/DashboardOverview";
-import InvestmentPlans from "./components/investments/InvestmentPlans";
-import UserInvestments from "./components/investments/UserInvestments";
-import CommissionsDashboard from "./components/commissions/CommissionsDashboard";
-import NetworkVisualization from "./components/network/NetworkVisualization";
-import UserProfile from "./components/profile/UserProfile";
-import AdminDashboard from "./components/admin/AdminDashboard";
-import KYCVerification from "./components/kyc/KYCVerification";
-import Leaderboard from "./components/gamification/Leaderboard";
-import WebsiteEditor from "./components/visual-editor/WebsiteEditor";
-import TeamManagement from "./components/team/TeamManagement";
-import TokenManagement from "./components/tokens/TokenManagement";
-import FaucetManagement from "./components/tokens/FaucetManagement";
-import AirdropManagement from "./components/tokens/AirdropManagement";
-import UserTokens from "./components/tokens/UserTokens";
-import TokenClaimPage from "./components/tokens/TokenClaimPage";
-import ProtectedRoute from "./components/auth/ProtectedRoute";
-import { ErrorBoundary } from "./components/error-boundary";
-import PlanManagement from "./components/admin/PlanManagement";
+import { createBrowserRouter } from "react-router-dom";
 import AdminRoute from "./components/auth/AdminRoute";
+import ProtectedRoute from "./components/auth/ProtectedRoute";
 
-const routes: RouteObject[] = [
+const routes = createBrowserRouter([
+  // Public routes
+  {
+    path: "/",
+    element: <Home />,
+  },
+  {
+    path: "/login",
+    element: <Login />,
+  },
+  // User dashboard routes
   {
     path: "/dashboard",
     element: (
       <ProtectedRoute>
-        <DashboardOverview />
+        <DashboardLayout>
+          <DashboardOverview />
+        </DashboardLayout>
       </ProtectedRoute>
     ),
   },
-  {
-    path: "/login",
-    element: <LoginForm />,
-  },
-  {
-    path: "/register",
-    element: <RegisterForm />,
-  },
-  {
-    path: "/forgot-password",
-    element: <ForgotPasswordForm />,
-  },
-  {
-    path: "/reset-password",
-    element: <ResetPasswordForm />,
-  },
-  {
-    path: "/investments",
-    element: (
-      <ProtectedRoute>
-        <InvestmentPlans />
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: "/my-investments",
-    element: (
-      <ProtectedRoute>
-        <UserInvestments />
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: "/commissions",
-    element: (
-      <ProtectedRoute>
-        <CommissionsDashboard />
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: "/network",
-    element: (
-      <ProtectedRoute>
-        <NetworkVisualization />
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: "/team",
-    element: (
-      <ProtectedRoute>
-        <TeamManagement />
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: "/profile",
-    element: (
-      <ProtectedRoute>
-        <UserProfile />
-      </ProtectedRoute>
-    ),
-  },
+  // Admin routes
   {
     path: "/admin",
     element: (
-      <ProtectedRoute>
+      <AdminRoute>
         <AdminDashboard />
-      </ProtectedRoute>
+      </AdminRoute>
     ),
   },
   {
-    path: "/kyc",
+    path: "/admin/users",
     element: (
-      <ProtectedRoute>
-        <KYCVerification />
-      </ProtectedRoute>
+      <AdminRoute>
+        <UserManagement />
+      </AdminRoute>
     ),
   },
   {
-    path: "/leaderboard",
+    path: "/admin/reports",
     element: (
-      <ProtectedRoute>
-        <Leaderboard />
-      </ProtectedRoute>
+      <AdminRoute>
+        <ReportsManagement />
+      </AdminRoute>
     ),
   },
   {
-    path: "/website-editor",
+    path: "/admin/notifications",
     element: (
-      <ProtectedRoute>
-        <AdminRoute>
-          <WebsiteEditor />
-        </AdminRoute>
-      </ProtectedRoute>
-    ),
-  },
-  // Token Management Routes
-  {
-    path: "/tokens/manage",
-    element: (
-      <ProtectedRoute>
-        <TokenManagement />
-      </ProtectedRoute>
+      <AdminRoute>
+        <NotificationManagement />
+      </AdminRoute>
     ),
   },
   {
-    path: "/tokens/faucets",
+    path: "/admin/website",
     element: (
-      <ProtectedRoute>
-        <FaucetManagement />
-      </ProtectedRoute>
+      <AdminRoute>
+        <WebsiteSettings />
+      </AdminRoute>
     ),
   },
-  {
-    path: "/tokens/airdrops",
-    element: (
-      <ProtectedRoute>
-        <AirdropManagement />
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: "/tokens/my-tokens",
-    element: (
-      <ProtectedRoute>
-        <UserTokens />
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: "/tokens/claim",
-    element: (
-      <ProtectedRoute>
-        <TokenClaimPage />
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: "/admin/plans",
-    element: (
-      <ProtectedRoute>
-        <AdminRoute>
-          <PlanManagement />
-        </AdminRoute>
-      </ProtectedRoute>
-    ),
-  },
-];
+]);
 
 export default routes;
