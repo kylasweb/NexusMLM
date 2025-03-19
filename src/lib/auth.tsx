@@ -1,18 +1,11 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
-import { createClient, SupabaseClient, User } from '@supabase/supabase-js';
+import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import { AuthContext } from './AuthContext';
 
-interface AuthContextType {
-  user: User | null;
-  supabase: SupabaseClient;
-  signIn: (email: string, password: string) => Promise<void>;
-  signUp: (email: string, password: string) => Promise<void>;
-  signOut: () => Promise<void>;
-  updateProfile: (data: { username?: string; avatar_url?: string }) => Promise<void>;
+interface AuthProviderProps {
+  children: ReactNode;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
-
-export function AuthProvider({ children }: { children: React.ReactNode }) {
+export function AuthProvider({ children }: AuthProviderProps) {
   const supabase = createClient(
     process.env.VITE_SUPABASE_URL as string,
     process.env.VITE_SUPABASE_ANON_KEY as string
@@ -48,19 +41,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const value = {
     user,
-    supabase,
-    signIn: async (email: string, password: string) => {
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error) throw error;
-    },
-    signUp: async (email: string, password: string) => {
-      const { error } = await supabase.auth.signUp({ email, password });
-      if (error) throw error;
-    },
-    signOut: async () => {
-      const { error } = await supabase.auth.signOut();
-      if (error) throw error;
-    },
+    signIn,
+    signOut,
     updateProfile,
   };
 
@@ -69,10 +51,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
 export function useAuth() {
   const context = useContext(AuthContext);
-  if (context === undefined) {
+  if (!context) {
     throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
 }
+
 
 
