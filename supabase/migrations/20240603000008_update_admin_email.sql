@@ -1,4 +1,5 @@
--- Update admin email in all RLS policies
+
+-- Update admin policies to use role-based checks
 DO $$ 
 DECLARE
     table_name text;
@@ -16,7 +17,7 @@ BEGIN
             AND tablename = table_name
         LOOP
             EXECUTE format('DROP POLICY IF EXISTS %I ON public.%I', policy_name, table_name);
-            EXECUTE format('CREATE POLICY %I ON public.%I FOR ALL USING (auth.jwt() ->> ''email'' = ''Kailaspnair@yahoo.com'')', policy_name, table_name);
+            EXECUTE format('CREATE POLICY %I ON public.%I FOR ALL USING (auth.jwt() ->> ''role'' = ''admin'')', policy_name, table_name);
         END LOOP;
     END LOOP;
 END $$; 

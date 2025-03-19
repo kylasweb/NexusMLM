@@ -13,7 +13,8 @@ const AdminRoute: React.FC<AdminRouteProps> = ({ children }) => {
     return <div>Loading...</div>;
   }
 
-  if (!user || user.email !== "Kailaspnair@yahoo.com") {
+  // Check for admin role
+  if (!user?.role || user.role !== 'admin') {
     return <Navigate to="/dashboard" replace />;
   }
 

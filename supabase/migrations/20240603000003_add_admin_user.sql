@@ -1,9 +1,10 @@
+
 -- Add admin user to auth.users table
 DO $$
 DECLARE
   admin_id UUID := gen_random_uuid();
 BEGIN
-  -- Insert into auth.users
+  -- Insert into auth.users with role
   INSERT INTO auth.users (id, email, encrypted_password, email_confirmed_at, created_at, updated_at, role)
   VALUES (
     admin_id,
@@ -12,7 +13,7 @@ BEGIN
     now(),
     now(),
     now(),
-    'authenticated'
+    'admin'  -- Set the role to admin
   );
   
   -- Create public.users table if it doesn't exist first
@@ -25,8 +26,8 @@ BEGIN
     updated_at TIMESTAMPTZ
   );
   
-  -- Insert into public.users table
-  INSERT INTO public.users (id, email, full_name, created_at)
-  VALUES (admin_id, 'Kailaspnair@yahoo.com', 'Admin User', now());
+  -- Insert into public.users table with role
+  INSERT INTO public.users (id, email, full_name, created_at, role)
+  VALUES (admin_id, 'Kailaspnair@yahoo.com', 'Admin User', now(), 'admin');
 END
 $$;
