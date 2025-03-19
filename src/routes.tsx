@@ -1,7 +1,7 @@
 import { createBrowserRouter } from "react-router-dom";
 import AdminRoute from "./components/auth/AdminRoute";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
-import Home from "./components/Home";
+import Home from "./components/home";
 
 const routes = createBrowserRouter([
   // Public routes
