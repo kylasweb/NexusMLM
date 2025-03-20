@@ -2,6 +2,14 @@ import { createBrowserRouter } from "react-router-dom";
 import AdminRoute from "./components/auth/AdminRoute";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import Home from "./components/home";
+import LoginForm from "./components/auth/LoginForm";
+import DashboardLayout from "./components/layout/DashboardLayout";
+import DashboardOverview from "./components/dashboard/DashboardOverview";
+import AdminDashboard from "./components/admin/AdminDashboard";
+import UserManagement from "./components/admin/UserManagement";
+import ReportsManagement from "./components/admin/ReportsManagement";
+import NotificationManagement from "./components/admin/NotificationManagement";
+import WebsiteSettings from "./components/admin/WebsiteSettings";
 
 const routes = createBrowserRouter([
   // Public routes
@@ -11,7 +19,7 @@ const routes = createBrowserRouter([
   },
   {
     path: "/login",
-    element: <Login />,
+    element: <LoginForm />,
   },
   // User dashboard routes
   {
