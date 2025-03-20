@@ -70,6 +70,12 @@ PREVENTION RULES ADDED:
     - Don't try to fix it yourself
     - Let the user handle recovery
 
+
+11. Always check existing configurations before modifying them
+Never replace working credentials with placeholder values
+Make minimal, targeted changes instead of wholesale replacements
+Focus on the specific issue (for example, just the NODE_ENV warning) rather than modifying unrelated configurations
+
 LEARNING OUTCOME:
 This error demonstrated the critical importance of:
 1. Verifying existing implementations before making changes
