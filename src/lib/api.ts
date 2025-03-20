@@ -206,7 +206,7 @@ export const getUserActivities = async (userId: string) => {
       .order("created_at", { ascending: false });
 
     if (error) throw error;
-    return data;
+    return data || [];
   });
 };
 
