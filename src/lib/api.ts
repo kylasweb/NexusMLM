@@ -211,6 +211,35 @@ export const getUserActivities = async (userId: string) => {
 };
 
 // Admin Functions
+export const getAdminStats = async () => {
+  return handleApiRequest(async () => {
+    const [
+      { data: users, error: usersError },
+      { data: investments, error: investmentsError },
+      { data: withdrawals, error: withdrawalsError }
+    ] = await Promise.all([
+      supabase.from("users").select("*"),
+      supabase.from("investments").select("*"),
+      supabase.from("withdrawals").select("*").eq("status", "pending")
+    ]);
+
+    if (usersError) throw usersError;
+    if (investmentsError) throw investmentsError;
+    if (withdrawalsError) throw withdrawalsError;
+
+    const totalInvestments = investments.reduce((sum, inv) => sum + (inv.amount || 0), 0);
+
+    return {
+      totalUsers: users.length,
+      activeUsers: users.filter(user => user.status === "active").length,
+      totalInvestments,
+      pendingWithdrawals: withdrawals.length,
+      totalEarnings: 0, // This would need to be calculated based on your business logic
+      pendingKYC: users.filter(user => user.kyc_status === "pending").length
+    };
+  });
+};
+
 export const getAllUsers = async () => {
   return handleApiRequest(async () => {
     const { data, error } = await supabase.from("users").select("*");
