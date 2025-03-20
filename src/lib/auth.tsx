@@ -23,7 +23,7 @@ interface AuthContextType {
   loading: boolean;
   error: Error | null;
   signIn: (email: string, password: string) => Promise<void>;
-  signUp: (email: string, password: string, fullName: string) => Promise<void>;
+  signUp: (email: string, password: string, fullName: string, sponsorId?: string) => Promise<void>;
   signOut: () => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
   updateProfile: (data: Partial<UserProfile>) => Promise<void>;
@@ -122,13 +122,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (error) throw error;
   }
 
-  async function signUp(email: string, password: string, fullName: string) {
+  async function signUp(email: string, password: string, fullName: string, sponsorId?: string) {
     const { error: signUpError } = await supabase.auth.signUp({
       email,
       password,
       options: {
         data: {
           full_name: fullName,
+          sponsor_id: sponsorId,
         },
       },
     });
@@ -145,6 +146,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           rank: 'Bronze',
           status: 'active',
           kyc_verified: false,
+          sponsor_id: sponsorId,
         },
       ]);
     if (profileError) throw profileError;

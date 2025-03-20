@@ -2,231 +2,221 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import PublicLayout from "./layout/PublicLayout";
+import { ArrowRight, Check, Users, DollarSign, Award, Shield } from "lucide-react";
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-indigo-100">
+    <PublicLayout>
       {/* Hero Section */}
-      <header className="container mx-auto px-4 py-16 md:py-24 flex flex-col items-center text-center">
-        <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
-          Binary Matrix MLM System
-        </h1>
-        <p className="text-xl text-gray-600 max-w-3xl mb-10">
-          A powerful multi-level marketing platform with binary matrix
-          structure, supporting 10 levels of referrals with comprehensive
-          management tools.
-        </p>
-        <div className="flex flex-col sm:flex-row gap-4">
-          <Link to="/register">
-            <Button size="lg" className="px-8">
-              Get Started
-            </Button>
-          </Link>
-          <Link to="/login">
-            <Button size="lg" variant="outline" className="px-8">
-              Login
-            </Button>
-          </Link>
+      <section className="relative bg-gradient-to-b from-primary/10 to-background pt-20 pb-32">
+        <div className="container mx-auto px-4">
+          <div className="flex flex-col lg:flex-row items-center gap-12">
+            <div className="flex-1 text-center lg:text-left">
+              <h1 className="text-4xl md:text-6xl font-bold mb-6">
+                Build Your Network Marketing Empire
+              </h1>
+              <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto lg:mx-0">
+                Join the most powerful binary matrix MLM platform with advanced tools,
+                automated commissions, and real-time analytics.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+                <Link to="/register">
+                  <Button size="lg" className="w-full sm:w-auto">
+                    Start Free Trial
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </Link>
+                <Link to="/features">
+                  <Button size="lg" variant="outline" className="w-full sm:w-auto">
+                    Learn More
+                  </Button>
+                </Link>
+              </div>
+            </div>
+            <div className="flex-1">
+              <img
+                src="/hero-illustration.svg"
+                alt="Network Marketing Illustration"
+                className="w-full max-w-lg mx-auto"
+              />
+            </div>
+          </div>
         </div>
-      </header>
+      </section>
 
       {/* Features Section */}
-      <section className="container mx-auto px-4 py-16">
-        <h2 className="text-3xl font-bold text-center mb-12">Key Features</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <Card>
-            <CardContent className="p-6 flex flex-col items-center text-center">
-              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-4">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-8 w-8 text-blue-600"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
-                  />
-                </svg>
-              </div>
-              <h3 className="text-xl font-semibold mb-2">
-                Binary Matrix Structure
-              </h3>
-              <p className="text-gray-600">
-                Powerful binary matrix with left/right legs and extreme
-                positions, supporting 10 referral levels with spillover pool
-                management.
-              </p>
-            </CardContent>
-          </Card>
+      <section className="py-20">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl font-bold mb-4">Why Choose NexusMLM?</h2>
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+              Everything you need to build and scale your network marketing business
+              in one powerful platform.
+            </p>
+          </div>
 
-          <Card>
-            <CardContent className="p-6 flex flex-col items-center text-center">
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-8 w-8 text-green-600"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-                  />
-                </svg>
-              </div>
-              <h3 className="text-xl font-semibold mb-2">Admin Dashboard</h3>
-              <p className="text-gray-600">
-                Comprehensive admin tools with user management, finance tools,
-                commission calculation, rank management, and custom plan
-                creator.
-              </p>
-            </CardContent>
-          </Card>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <FeatureCard
+              icon={<Users className="h-8 w-8 text-primary" />}
+              title="Binary Matrix Structure"
+              description="Powerful binary matrix with left/right legs and extreme positions, supporting 10 referral levels."
+            />
+            <FeatureCard
+              icon={<DollarSign className="h-8 w-8 text-primary" />}
+              title="Automated Commissions"
+              description="Real-time commission calculations and instant payouts with multiple withdrawal options."
+            />
+            <FeatureCard
+              icon={<Award className="h-8 w-8 text-primary" />}
+              title="Rank System"
+              description="Dynamic rank advancement system with customizable rewards and bonuses."
+            />
+            <FeatureCard
+              icon={<Shield className="h-8 w-8 text-primary" />}
+              title="Secure Platform"
+              description="Bank-grade security with 2FA, encryption, and regular security audits."
+            />
+            <FeatureCard
+              icon={<Users className="h-8 w-8 text-primary" />}
+              title="Team Management"
+              description="Comprehensive tools for managing your downline and tracking performance."
+            />
+            <FeatureCard
+              icon={<DollarSign className="h-8 w-8 text-primary" />}
+              title="Investment Plans"
+              description="Flexible investment plans with customizable ROI and durations."
+            />
+          </div>
+        </div>
+      </section>
 
-          <Card>
-            <CardContent className="p-6 flex flex-col items-center text-center">
-              <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mb-4">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-8 w-8 text-purple-600"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </svg>
-              </div>
-              <h3 className="text-xl font-semibold mb-2">Investment Plans</h3>
-              <p className="text-gray-600">
-                Flexible investment plans with customizable ROI, durations, and
-                commission structures to maximize earnings for all members.
-              </p>
-            </CardContent>
-          </Card>
+      {/* Pricing Section */}
+      <section className="py-20 bg-muted/50">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl font-bold mb-4">Simple, Transparent Pricing</h2>
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+              Choose the perfect plan for your network marketing business.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+            <PricingCard
+              title="Starter"
+              price="$49"
+              description="Perfect for beginners"
+              features={[
+                "Up to 100 team members",
+                "Basic commission structure",
+                "Email support",
+                "Basic reporting",
+              ]}
+            />
+            <PricingCard
+              title="Professional"
+              price="$99"
+              description="For growing networks"
+              features={[
+                "Up to 1,000 team members",
+                "Advanced commission structure",
+                "Priority support",
+                "Advanced analytics",
+                "Custom branding",
+              ]}
+              highlighted
+            />
+            <PricingCard
+              title="Enterprise"
+              price="$199"
+              description="For large organizations"
+              features={[
+                "Unlimited team members",
+                "Custom commission rules",
+                "24/7 dedicated support",
+                "White-label solution",
+                "API access",
+              ]}
+            />
+          </div>
         </div>
       </section>
 
       {/* CTA Section */}
-      <section className="bg-blue-600 text-white py-16">
+      <section className="py-20 bg-primary text-primary-foreground">
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-6">
             Ready to Start Your MLM Business?
           </h2>
-          <p className="text-xl mb-8 max-w-2xl mx-auto">
+          <p className="text-xl mb-8 max-w-2xl mx-auto opacity-90">
             Join thousands of successful entrepreneurs who are building their
             network marketing business with our powerful platform.
           </p>
           <Link to="/register">
-            <Button size="lg" variant="secondary" className="px-8">
-              Sign Up Now
+            <Button
+              size="lg"
+              variant="secondary"
+              className="px-8"
+            >
+              Start Your Free Trial
             </Button>
           </Link>
         </div>
       </section>
+    </PublicLayout>
+  );
+}
 
-      {/* Footer */}
-      <footer className="bg-gray-800 text-white py-12">
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            <div>
-              <h3 className="text-xl font-bold mb-4">MLM Matrix</h3>
-              <p className="text-gray-400">
-                The most powerful binary matrix MLM system with advanced
-                management tools.
-              </p>
-            </div>
-            <div>
-              <h4 className="text-lg font-semibold mb-4">Quick Links</h4>
-              <ul className="space-y-2">
-                <li>
-                  <Link to="/" className="text-gray-400 hover:text-white">
-                    Home
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/about" className="text-gray-400 hover:text-white">
-                    About Us
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/features"
-                    className="text-gray-400 hover:text-white"
-                  >
-                    Features
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/pricing"
-                    className="text-gray-400 hover:text-white"
-                  >
-                    Pricing
-                  </Link>
-                </li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="text-lg font-semibold mb-4">Support</h4>
-              <ul className="space-y-2">
-                <li>
-                  <Link to="/faq" className="text-gray-400 hover:text-white">
-                    FAQ
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/contact"
-                    className="text-gray-400 hover:text-white"
-                  >
-                    Contact Us
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/help" className="text-gray-400 hover:text-white">
-                    Help Center
-                  </Link>
-                </li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="text-lg font-semibold mb-4">Legal</h4>
-              <ul className="space-y-2">
-                <li>
-                  <Link to="/terms" className="text-gray-400 hover:text-white">
-                    Terms of Service
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/privacy"
-                    className="text-gray-400 hover:text-white"
-                  >
-                    Privacy Policy
-                  </Link>
-                </li>
-              </ul>
-            </div>
-          </div>
-          <div className="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400">
-            <p>
-              &copy; {new Date().getFullYear()} MLM Matrix. All rights reserved.
-            </p>
-          </div>
+function FeatureCard({ icon, title, description }: {
+  icon: React.ReactNode;
+  title: string;
+  description: string;
+}) {
+  return (
+    <Card>
+      <CardContent className="p-6">
+        <div className="mb-4">{icon}</div>
+        <h3 className="text-xl font-semibold mb-2">{title}</h3>
+        <p className="text-muted-foreground">{description}</p>
+      </CardContent>
+    </Card>
+  );
+}
+
+function PricingCard({ title, price, description, features, highlighted = false }: {
+  title: string;
+  price: string;
+  description: string;
+  features: string[];
+  highlighted?: boolean;
+}) {
+  return (
+    <Card className={highlighted ? "border-primary shadow-lg scale-105" : ""}>
+      <CardContent className="p-6">
+        <div className="text-center mb-6">
+          <h3 className="text-xl font-semibold mb-2">{title}</h3>
+          <div className="text-3xl font-bold mb-2">{price}<span className="text-base font-normal">/month</span></div>
+          <p className="text-muted-foreground">{description}</p>
         </div>
-      </footer>
-    </div>
+        <ul className="space-y-3">
+          {features.map((feature, index) => (
+            <li key={index} className="flex items-center">
+              <Check className="h-4 w-4 text-primary mr-2" />
+              <span>{feature}</span>
+            </li>
+          ))}
+        </ul>
+        <div className="mt-6">
+          <Link to="/register">
+            <Button
+              className="w-full"
+              variant={highlighted ? "default" : "outline"}
+            >
+              Get Started
+            </Button>
+          </Link>
+        </div>
+      </CardContent>
+    </Card>
   );
 }
