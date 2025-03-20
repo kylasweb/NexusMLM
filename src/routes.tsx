@@ -1,4 +1,3 @@
-import { createBrowserRouter } from "react-router-dom";
 import AdminRoute from "./components/auth/AdminRoute";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import Home from "./components/home";
@@ -11,7 +10,7 @@ import ReportsManagement from "./components/admin/ReportsManagement";
 import NotificationManagement from "./components/admin/NotificationManagement";
 import WebsiteSettings from "./components/admin/WebsiteSettings";
 
-const routes = createBrowserRouter([
+const routes = [
   // Public routes
   {
     path: "/",
@@ -73,6 +72,6 @@ const routes = createBrowserRouter([
       </AdminRoute>
     ),
   },
-]);
+];
 
 export default routes;

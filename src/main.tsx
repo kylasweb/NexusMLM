@@ -21,10 +21,16 @@ window.onerror = function (message, source, lineno, colno, error) {
   return false; // Let the default handler run as well
 };
 
-ReactDOM.createRoot(document.getElementById("root")!).render(
+// Ensure the root element exists
+const rootElement = document.getElementById("root");
+if (!rootElement) {
+  throw new Error("Root element not found");
+}
+
+ReactDOM.createRoot(rootElement).render(
   <React.StrictMode>
     <BrowserRouter>
       <App />
     </BrowserRouter>
-  </React.StrictMode>,
+  </React.StrictMode>
 );

@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import { Toaster } from "@/components/ui/toaster";
 import { AuthProvider } from "@/lib/auth";
 import { ThemeProvider } from "@/contexts/ThemeContext";
@@ -21,19 +21,17 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <ThemeProvider defaultTheme="dark" storageKey="nexus-theme">
         <AuthProvider>
-          <Router>
-            <Routes>
-              {routes.map((route, index) => (
-                <Route
-                  key={index}
-                  path={route.path}
-                  element={route.element}
-                />
-              ))}
-            </Routes>
-            <Toaster />
-            <Sonner />
-          </Router>
+          <Routes>
+            {routes.map((route, index) => (
+              <Route
+                key={index}
+                path={route.path}
+                element={route.element}
+              />
+            ))}
+          </Routes>
+          <Toaster />
+          <Sonner />
         </AuthProvider>
       </ThemeProvider>
     </QueryClientProvider>

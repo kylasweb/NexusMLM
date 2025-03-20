@@ -42,10 +42,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     async function initializeAuth() {
       try {
+        // Check if Supabase is properly initialized
+        if (!supabase) {
+          throw new Error('Supabase client not initialized');
+        }
+
         // Check active sessions and sets the user
         const { data: { session }, error: sessionError } = await supabase.auth.getSession();
         
-        if (sessionError) throw sessionError;
+        if (sessionError) {
+          console.error('Session error:', sessionError);
+          throw sessionError;
+        }
 
         if (mounted) {
           setUser(session?.user ?? null);
@@ -57,6 +65,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         console.error('Error initializing auth:', err);
         if (mounted) {
           setError(err instanceof Error ? err : new Error('Failed to initialize auth'));
+          // Set loading to false even on error to prevent infinite loading
+          setLoading(false);
         }
       } finally {
         if (mounted) {
@@ -93,7 +103,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         .eq('id', userId)
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Profile fetch error:', error);
+        throw error;
+      }
       setProfile(data);
     } catch (error) {
       console.error('Error fetching profile:', error);
