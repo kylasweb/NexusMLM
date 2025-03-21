@@ -6,7 +6,7 @@ import { ThemeProvider } from "@/contexts/ThemeContext";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import routes from "./routes";
-import Home from "@/components/Home";
+import Home from "@/components/Home.tsx";
 import LoginForm from "@/components/auth/LoginForm";
 import RegisterForm from "@/components/auth/RegisterForm";
 import Dashboard from "@/components/dashboard/Dashboard";
